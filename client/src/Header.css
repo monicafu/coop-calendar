@@ -1,0 +1,14 @@
+/*Style for Header
+------------------- */
+
+header {
+	height: 8vh;
+	text-align: center;
+}
+
+header .panel {
+	display: flex;
+	width: 60vw;
+	border-radius: 25%;
+	background-color: #f1f1f1;
+}
