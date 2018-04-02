@@ -4,7 +4,8 @@
   "description": "A group calendar\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[C\u001b[C\u001b[C\u001b[\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C calendar for group",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,9 @@
   },
   "homepage": "https://github.com/seainfo6250/project-malachite#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "connect-flash": "^0.1.1",
+    "express": "^4.16.3",
+    "mongoose": "^5.0.12",
+    "passport": "^0.4.0"
   }
 }
