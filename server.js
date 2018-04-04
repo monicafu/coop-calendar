@@ -136,6 +136,11 @@ app.put('/user/event',isLoggedIn,function (req,res) {
                        });
                    }
                });
+           }else{
+               req.flash("error", "You don't have permission to do that!");
+               res.status(200).send({
+                   isUpdated :false
+               });
            }
        }
     });
@@ -161,6 +166,11 @@ app.delete('/user/event',isLoggedIn, function (req,res) {
                             isDeleted :true
                         });
                     }
+                });
+            }else{
+                req.flash("error", "You don't have permission to do that!");
+                res.status(200).send({
+                    isUpdated :false
                 });
             }
         }
