@@ -11,7 +11,7 @@ const middleware = {
     },
     checkUserEvent : (req, res, next) => {
         if (req.isAuthenticated()){
-            Event.findById(req.params.id, function (err, event) {
+            Event.findById(req.body.id, function (err, event) {
                if (event.creator.id.equals(req.user._id)){
                    next();
                }else{

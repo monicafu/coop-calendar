@@ -114,21 +114,30 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 /* a logged user edit event*/
 app.put('/user/event',isLoggedIn,function (req,res) {
-    Event.findByIdAndUpdate(req.body.event._id,req.body.event,function (err, event) {
-        if (err){
-            console.log(err);
-            res.status(400).send({'msg':'update-event-failed'});
-        }else{
-            //event creator remains the same
-            event.creator.id = req.user._id;
-            event.creator.username = req.user.username;
-            //save event to db
-            event.save();
-            req.flash('success','Update event successfully!');
-            res.status(200).send({
-                isUpdated :true
-            });
-        }
+    Event.findById(req.body.event._id,function (err,event) {
+       if (err){
+           console.log(err);
+           res.status(400).send({'msg':'find-event-failed'});
+       }else{
+           if (event.visibility === 'private'){
+               Event.findByIdAndUpdate(req.body.event._id,req.body.event,function (err, event) {
+                   if (err){
+                       console.log(err);
+                       res.status(400).send({'msg':'update-event-failed'});
+                   }else{
+                       //event creator remains the same
+                       event.creator.id = req.user._id;
+                       event.creator.username = req.user.username;
+                       //save event to db
+                       event.save();
+                       req.flash('success','Update event successfully!');
+                       res.status(200).send({
+                           isUpdated :true
+                       });
+                   }
+               });
+           }
+       }
     });
 });
 
@@ -136,16 +145,25 @@ app.put('/user/event',isLoggedIn,function (req,res) {
 
 /* a logged user delete event*/
 app.delete('/user/event',isLoggedIn, function (req,res) {
-    Event.findByIdAndRemove(req.body.event._id,function (err) {
-       if (err){
-           console.log(err);
-           res.status(400).send({'msg':'delete-event-failed'});
-       }else{
-           req.flash('success','delete event successfully!');
-           res.status(200).send({
-               isDeleted :true
-           });
-       }
+    Event.findById(req.body.event._id,function (err,event) {
+        if (err){
+            console.log(err);
+            res.status(400).send({'msg':'find-event-failed'});
+        }else{
+            if (event.visibility === 'private'){
+                Event.findByIdAndRemove(req.body.event._id,function (err) {
+                    if (err){
+                        console.log(err);
+                        res.status(400).send({'msg':'delete-event-failed'});
+                    }else{
+                        req.flash('success','delete event successfully!');
+                        res.status(200).send({
+                            isDeleted :true
+                        });
+                    }
+                });
+            }
+        }
     });
 });
 
