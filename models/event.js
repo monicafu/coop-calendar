@@ -12,6 +12,7 @@ const eventSchema = mongoose.Schema({
         },
         username :String
     },
+    visibility: String,
     category : String,
     location : String,
 });
