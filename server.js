@@ -1,12 +1,13 @@
 // --- Initialization ---
-const express   = require('express');
-const bodyParser = require('body-parser');
-const path      = require('path');
-const app       = express();
-const mongoose = require('mongoose');
-const PORT     = process.env.PORT || 5000;
-const passport = require('passport');
-const flash    = require("connect-flash");
+const express   = require('express'),
+    bodyParser = require('body-parser'),
+    path      = require('path'),
+    app       = express(),
+    mongoose = require('mongoose'),
+    PORT     = process.env.PORT || 5000,
+    passport = require('passport'),
+    LocalStrategy = require("passport-local"),
+    flash    = require("connect-flash");
 
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
@@ -21,7 +22,7 @@ const Event = require('./models/event');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    console.log('connected successfully!');
+    console.log('mongodb connected successfully!');
 });
 
 // --- passport configuration ---
@@ -36,8 +37,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
     res.locals.currentUser = req.user;
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
+    //res.locals.success = req.flash('success');
+    //res.locals.error = req.flash('error');
     next();
 });
 
@@ -57,7 +58,7 @@ const {isLoggedIn,checkUserEvent} = require('./middleware.js');
 // --- Router ---
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/year/month',isLoggedIn,function (req,res){
+app.get('/user/:id/:year/:month',isLoggedIn,function (req,res){
     const year = req.params.year;
     const month = req.params.month;
     let events = {};
@@ -101,7 +102,8 @@ app.post('/user/event',isLoggedIn,function (req,res) {
                     //add this event to user
                     user.events.push(event);
                     user.save();
-                    req.flash('success','Created a new event!');
+                    console.log('success,Created a new event!');
+                    //req.flash('success','Created a new event!');
                     res.status(200).send({
                         isCreated :true
                     });
@@ -130,14 +132,16 @@ app.put('/user/event',isLoggedIn,function (req,res) {
                        event.creator.username = req.user.username;
                        //save event to db
                        event.save();
-                       req.flash('success','Update event successfully!');
+                       console.log('Update event successfully!');
+                       //req.flash('success','Update event successfully!');
                        res.status(200).send({
                            isUpdated :true
                        });
                    }
                });
            }else{
-               req.flash("error", "You don't have permission to do that!");
+               console.log("error,user don't have permission to do that!");
+               //req.flash("error", "You don't have permission to do that!");
                res.status(200).send({
                    isUpdated :false
                });
@@ -161,16 +165,17 @@ app.delete('/user/event',isLoggedIn, function (req,res) {
                         console.log(err);
                         res.status(400).send({'msg':'delete-event-failed'});
                     }else{
-                        req.flash('success','delete event successfully!');
+                        //req.flash('success','delete event successfully!');
                         res.status(200).send({
                             isDeleted :true
                         });
                     }
                 });
             }else{
-                req.flash("error", "You don't have permission to do that!");
+                console.log("error,user don't have permission to do that!");
+                //req.flash("error", "You don't have permission to do that!");
                 res.status(200).send({
-                    isUpdated :false
+                    isDeleted :false
                 });
             }
         }

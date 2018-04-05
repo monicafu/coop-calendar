@@ -4,7 +4,7 @@ const middleware = {
         if (req.isAuthenticated()) {
             return next();
         }
-        req.flash("error", "You must be signed in to do that!");
+        //req.flash("error", "You must be signed in to do that!");
         res.status(400).send(
             JSON.stringify({'msg':'user-is-not-logging'})
         );
@@ -15,7 +15,7 @@ const middleware = {
                if (event.creator.id.equals(req.user._id)){
                    next();
                }else{
-                   req.flash("error", "You don't have permission to do that!");
+                   //req.flash("error", "You don't have permission to do that!");
                    res.status(400).send(
                        JSON.stringify({'msg':'find-user-event-failed'})
                    );
@@ -23,7 +23,7 @@ const middleware = {
 
             });
         }else{
-            req.flash("error", "You must be signed in to do that!");
+            //req.flash("error", "You must be signed in to do that!");
             res.status(400).send(
                 JSON.stringify({'msg':'user-is-not-logging'})
             );
