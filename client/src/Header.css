@@ -1,0 +1,119 @@
+/* Style for Header
+------------------- */
+
+header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex: none;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+header .panel {
+	display: flex;
+	align-items: center;
+	width: 70%;
+	padding: 5px 25px;
+	border-radius: 25px;
+	box-shadow: 0 0 5px #b1b1b1;
+}
+
+
+/* Date-control
+--------------- */
+
+.date-control {
+	display: flex;
+	align-items: center;
+	flex: 1 1 0%;
+}
+
+.display {
+	display: flex;
+	font-size: 18px;
+}
+
+.paging {
+	display: flex;
+	align-items: center;
+}
+
+.paging svg {
+	cursor: pointer;
+	transition: .2s;
+}
+
+.paging svg:hover {
+	fill: #b7d7d9;
+}
+
+.today {
+	display: flex;
+	background-color: #b1b1b1;
+	padding: 2px 5px;
+	border: none;
+	border-radius: 5px;
+	outline: none;
+	cursor: pointer;
+	color: white;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	transition: .2s;
+}
+
+.today:hover, .today:focus {
+	background-color: #b7d7d9;
+}
+
+/* Search
+----------- */
+
+.search {
+	display: flex;
+	flex: 1 1 0%;
+	justify-content: center;
+	align-items: center;
+}
+
+.search input {
+	padding: 1px 25px 1px 5px;
+	border: 2px solid #f1f1f1;
+	border-radius: 5px;
+	outline: none;
+	font-family: 'Noto Sans', sans-serif;
+	transition: .2s;
+}
+
+.search input:focus {
+	border-color: #b1b1b1;
+	box-shadow: 0 0 0 1px #b1b1b1;
+}
+
+.search-icon {
+	width: 20px;
+	margin-left: -24px;
+	cursor: pointer;
+}
+
+/* Tools
+----------- */
+
+.tools {
+	display: flex;
+	flex: 1 1 0%;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.add-icon {
+	display: flex;
+	height: 20px;
+	cursor: pointer;
+	transition: .2s;
+}
+
+.add-icon:hover {
+	fill: #b7d7d9;
+}
