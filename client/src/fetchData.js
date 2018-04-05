@@ -16,7 +16,7 @@ export const createEvent = async (url,id,event) => {
         let res = await fetch(url, {
             method: 'POST',
             Origin: 'http://localhost:5000',
-            mode: 'cors',
+            headers:{'Accept': 'application/json'},
             body: JSON.stringify({
                 id,
                 event
@@ -33,7 +33,7 @@ export const editEvent = async (url,event) => {
         let res = await fetch(url, {
             method: 'PUT',
             Origin: 'http://localhost:5000',
-            mode: 'cors',
+            headers:{'Accept': 'application/json'},
             body: JSON.stringify({
                 event,
             })
@@ -49,7 +49,7 @@ export const deleteEvent = async (url,event) => {
         let res = await fetch(url, {
             method: 'DELETE',
             Origin: 'http://localhost:5000',
-            mode: 'cors',
+            headers:{'Accept': 'application/json'},
             body: JSON.stringify({
                 event,
             })

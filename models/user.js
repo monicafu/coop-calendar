@@ -1,4 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'),
+      passportLocalMongoose = require("passport-local-mongoose");
+
 // Define schema
 const userSchema = mongoose.Schema({
     username:String,
@@ -8,5 +10,7 @@ const userSchema = mongoose.Schema({
         ref: 'Event'
     }]
 });
+
+userSchema.plugin(passportLocalMongoose);
 // Compile model from schema
-modules.exports = mongoose.model('User',userSchema);
+module.exports = mongoose.model('User',userSchema);
