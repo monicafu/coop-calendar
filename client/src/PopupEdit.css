@@ -1,0 +1,7 @@
+/*Style for PopupEdit
+---------------------- */
+
+.popup-eidt {
+	display: flex;
+	position: fixed;
+}

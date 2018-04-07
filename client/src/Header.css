@@ -13,6 +13,7 @@ header {
 header .panel {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	width: 70%;
 	padding: 5px 25px;
 	border-radius: 25px;
@@ -45,7 +46,7 @@ header .panel {
 }
 
 .paging svg:hover {
-	fill: #b7d7d9;
+	fill: #f1f1f1;
 }
 
 .today {
@@ -115,5 +116,5 @@ header .panel {
 }
 
 .add-icon:hover {
-	fill: #b7d7d9;
+	fill: #f1f1f1;
 }

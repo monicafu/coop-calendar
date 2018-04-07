@@ -1,0 +1,73 @@
+/* Style for DayCell
+------------------------ */
+
+.day-cell {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-start;
+	align-content: flex-start;
+	flex: 1 1 0%;
+	padding: 2px 5px;
+	border-radius: 5px;
+	overflow: hidden;
+	transition: .3s;
+}
+
+.day-cell:hover {
+	box-shadow: 0 0 10px #b1b1b1;
+}
+
+.cell-disabled:hover {
+	box-shadow: none;
+}
+
+.day-num {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	width: 100%;
+	cursor: pointer;
+}
+
+/*.day-num::before {
+	content: ' ';
+	display: flex;
+	position: absolute;
+	left: 1%;
+	width: 1em;
+	height: 1em;
+	border-radius: 50%;
+	box-shadow: 0 0 5px #b1b1b1;
+	line-height: 0.8em;
+	opacity: 0;
+	transition: .2s;
+}
+
+.day-num:hover::before {
+	opacity: 1;
+}*/
+
+.event-bar {
+	display: flex;
+	flex: none;
+	width: 95%;
+	padding: 0 5px;
+	margin: 1px 0;
+	border-radius: 5px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.event-private {
+	background-color: #bfe9ff;
+}
+
+.event-public {
+	background-color: #ffe9cd;
+}
+
+.event-past {
+	background-color: #d1d1d1;
+}

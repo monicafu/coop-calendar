@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-const Header = ( {currentMonth, currentYear, clickLeft, clickRight, clickToday} ) => {
+const Header = ( { currentMonth, currentYear, clickLeft, clickRight, clickToday, clickAdd } ) => {
 	const monthStr= ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	return (
@@ -12,12 +12,12 @@ const Header = ( {currentMonth, currentYear, clickLeft, clickRight, clickToday} 
 						<svg className="left-icon" onClick={ clickLeft } fill="#b1b1b1" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 						    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
 						</svg>
-						<button className="today" onClick={clickToday}>Today</button>
+						<button className="today" onClick={ clickToday }>Today</button>
 						<svg className="right-icon" onClick={ clickRight } fill="#b1b1b1" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 						    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
 						</svg>
 					</div>
-					<div className="display">{ `${ monthStr[currentMonth] }, ${ currentYear }` }</div>
+					<div className="display">{ `${ monthStr[currentMonth] } ${ currentYear }` }</div>
 				</div>
 				<div className="search">
 					<input type="text" />
@@ -26,7 +26,7 @@ const Header = ( {currentMonth, currentYear, clickLeft, clickRight, clickToday} 
 					</svg>
 				</div>
 				<div className="tools">
-					<svg className="add-icon" fill="#797979" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+					<svg onClick={ clickAdd } className="add-icon" fill="#797979" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
 					</svg>
 					<span className="login">Login</span>

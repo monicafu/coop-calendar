@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import './Calendar.css';
 
+// Component
+import DayCell from './DayCell';
+
 // Date calculator
 import cal from './script/dateCalculator.js';
 
@@ -22,12 +25,12 @@ class Calendar extends Component {
 				let day = cellIndex - cal.firstDay(currentDate) + 1;
 
 				rows.push(
-					<div className={ `day-cell ${ day <= 0 || day > cal.monthDays(currentDate) ? 'cell-disabled' : '' }` } key={row}>{ day <= 0 || day > cal.monthDays(currentDate) ? '' : day }</div>
+					<DayCell day={ day } currentDate={ currentDate } key={ row } />
 				);
 			}
 
 			grid.push (
-				<div className="day-col" key={col}>
+				<div className="day-col" key={ col }>
 					{ rows }
 				</div>
 			);
@@ -38,7 +41,6 @@ class Calendar extends Component {
 
 	render() {
 		const grid = this.generateGrid();
-		console.log(cal.column(this.props.currentDate));
 
 		return (
 			<main>
