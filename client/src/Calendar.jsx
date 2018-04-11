@@ -10,6 +10,11 @@ import cal from './script/dateCalculator.js';
 class Calendar extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			isPopupAddOpen: false,
+			isPopupEditOpen: false
+		}
+
 		this.generateGrid = this.generateGrid.bind(this);
 	}
 
@@ -56,6 +61,7 @@ class Calendar extends Component {
 				<div className="grid">
 					{ grid }
 				</div>
+
 			</main>
 		);
 	}

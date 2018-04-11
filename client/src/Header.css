@@ -51,7 +51,7 @@ header .panel {
 
 .today {
 	display: flex;
-	background-color: #b1b1b1;
+	background-color: #b7d7d9;
 	padding: 2px 5px;
 	border: none;
 	border-radius: 5px;
@@ -65,7 +65,7 @@ header .panel {
 }
 
 .today:hover, .today:focus {
-	background-color: #b7d7d9;
+	background-color: #a4c1c3;
 }
 
 /* Search
@@ -108,13 +108,17 @@ header .panel {
 	align-items: center;
 }
 
-.add-icon {
+.tools .add-icon {
 	display: flex;
 	height: 20px;
 	cursor: pointer;
 	transition: .2s;
 }
 
-.add-icon:hover {
+.tools .add-icon:hover {
 	fill: #f1f1f1;
+}
+
+.tools .login {
+	cursor: pointer;
 }

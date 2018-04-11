@@ -4,8 +4,10 @@ import './PopupAdd.css';
 class PopupAdd extends Component {
 
 	render() {
+		const date = this.props.date;
+
 		return (
-			<div className={ `popup-add ${ this.props.isOpen ? '' : 'popup-add-hidden' }` } >
+			<div className="popup-add" >
 				<div className="mask" onClick={ this.props.closePopup } ></div>
 				<div className="panel">
 					<div className="field">
@@ -15,17 +17,17 @@ class PopupAdd extends Component {
 					<div className="field date">
 						<label htmlFor="start-date">Start Date</label>
 						<div className="date-form">
-							<input id="start-date" type="number" name="year" placeholder="Year" />
-							<input type="number" placeholder="Month" />
-							<input type="number" name="day" placeholder="Day" />
+							<input id="start-date" type="number" name="year" placeholder="Year" defaultValue={ date ? date[0] : null } />
+							<input type="number" placeholder="Month" defaultValue={ date ? date[1] + 1 : null } />
+							<input type="number" name="day" placeholder="Day" defaultValue={ date ? date[2] : null } />
 						</div>
 					</div>
 					<div className="field date">
 						<label htmlFor="end-date">End Date</label>
 						<div className="date-form">
-							<input id="end-date" type="number" name="year" placeholder="Year" />
-							<input type="number" name="month" placeholder="Month" />
-							<input type="number" name="day" placeholder="Day" />
+							<input id="end-date" type="number" name="year" placeholder="Year" defaultValue={ date ? date[0] : null } />
+							<input type="number" name="month" placeholder="Month" defaultValue={ date ? date[1] +1 : null } />
+							<input type="number" name="day" placeholder="Day" defaultValue={ date ? date[2] : null } />
 						</div>
 					</div>
 					<div className="field">

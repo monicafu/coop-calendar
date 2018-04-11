@@ -39,6 +39,19 @@ const setNextMonth = (date) => {
 	return date;
 }
 
+// Compare today
+const compareToday = (day, date) => {
+	const today = getToday();
+	const year = date.getFullYear();
+	const month = date.getMonth();
+
+	if ( year === today.getFullYear() && month === today.getMonth() && day === today.getDate() ) {
+		return true;
+	}
+
+	return false;
+}
+
 
 // Interface
 const calculator = {
@@ -59,6 +72,9 @@ const calculator = {
 	},
 	nextMonth: (date) => {
 		return setNextMonth(date);
+	},
+	isToday: (day, date) => {
+		return compareToday(day, date);
 	}
 };
 

@@ -1,0 +1,60 @@
+/* Style for Login
+------------------- */
+
+.login-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: white;
+}
+
+.btn-close-login {
+	position: absolute;
+	top: 20px;
+	right: 40px;
+	font-size: 20px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.login-modal .panel {
+	position: absolute;
+	top: 20vh;
+	right: 25vw;
+	left: 25vw;
+}
+
+.tab-container {
+	display: flex;
+	flex-direction: column;
+	width: 80%;
+	margin: 0 auto;
+}
+
+.tab-container .field {
+	display: flex;
+	flex-direction: column;
+	margin: 8px 0;
+}
+
+.tab-container label {
+	margin-bottom: 5px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.tab-container input {
+	border: none;
+	border-bottom: 2px solid #b1b1b1;
+	outline: none;
+	background: none;
+	color: #202020;
+	font-size: 14px;
+	transition: .2s;
+}
+
+.tab-container input:focus {
+	border-bottom: 2px solid #202020;
+}

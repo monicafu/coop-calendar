@@ -1,7 +1,11 @@
 import React from 'react';
 import './Header.css';
 
-const Header = ( { currentMonth, currentYear, clickLeft, clickRight, clickToday, clickAdd } ) => {
+// Components
+
+// import Modal from './Modal';
+
+const Header = ( { currentMonth, currentYear, clickLeft, clickRight, clickToday, clickAdd, clickLogin } ) => {
 	const monthStr= ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	return (
@@ -29,7 +33,7 @@ const Header = ( { currentMonth, currentYear, clickLeft, clickRight, clickToday,
 					<svg onClick={ clickAdd } className="add-icon" fill="#797979" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
 					</svg>
-					<span className="login">Login</span>
+					<span className="login" onClick={ clickLogin }>Login</span>
 				</div>
 			</div>
 		</header>

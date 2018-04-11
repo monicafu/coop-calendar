@@ -6,6 +6,7 @@ import Header from './Header';
 import Calendar from './Calendar';
 import Modal from './Modal';
 import PopupAdd from './PopupAdd';
+import Login from './Login';
 
 // Date calculator
 import cal from './script/dateCalculator.js';
@@ -16,8 +17,9 @@ class App extends Component {
 		this.state = {
 			currentDate: cal.today(),
 			searchContent: null,
+			isLogin: false,
 			isPopupAddOpen: false,
-			isPopupEditOpen: false
+			isPopupEditOpen: false,
 		};
 
 		this.pageUp = this.pageUp.bind(this);
@@ -25,6 +27,7 @@ class App extends Component {
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.jumpToday = this.jumpToday.bind(this);
 		this.togglePopupAdd = this.togglePopupAdd.bind(this);
+		this.toggleLogin = this.toggleLogin.bind(this);
 	}
 
 	componentDidMount() {
@@ -64,8 +67,14 @@ class App extends Component {
 	togglePopupAdd() {
 		this.setState( prevState => ({
 			isPopupAddOpen: !prevState.isPopupAddOpen,
-			isPopupEditOpen: false
+			isPopupEditOpen: false,
 		}));
+	}
+
+	toggleLogin() {
+		this.setState( prevState => ({
+			isLogin: !prevState.isLogin,
+		}))
 	}
 
   	render() {
@@ -77,13 +86,17 @@ class App extends Component {
 		      		clickLeft={ this.pageUp }
 		      		clickRight={ this.pageDown }
 		      		clickToday={ this.jumpToday }
-		      		clickAdd={ this.togglePopupAdd } />
+		      		clickAdd={ this.togglePopupAdd }
+		      		clickLogin={ this.toggleLogin } />
 		      	<Calendar
 		      		currentDate={ this.state.currentDate }
 		      		today={ this.state.today } />
 		      	<Modal>
-		      		<PopupAdd isOpen={ this.state.isPopupAddOpen } closePopup={ this.togglePopupAdd } />
+		      		{ this.state.isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } /> : null }
 		      	</Modal>
+				<Modal>
+					{ this.state.isLogin ? <Login closePage={ this.toggleLogin } /> : null }
+				</Modal>
 	      	</div>
 	    );
 	  }
