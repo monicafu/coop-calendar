@@ -10,8 +10,8 @@ const express   = require('express'),
     passport = require('passport'),
     crypto = require('crypto'),
     LocalStrategy = require("passport-local"),
-    flash    = require("connect-flash");
-
+    flash    = require("connect-flash"),
+    deasync = require('deasync');
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use( bodyParser.json({ extended: true, type: '*/*' }) );
@@ -183,41 +183,43 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',function (req,res){
+app.get('/user/:id/:year/:month',(req, res) => {
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month) + 1;
-    console.log("url year: "+year+" ,url month: "+ month);
-    let events = [];
-    User.findById(req.params.id,function (err, user) {
+    let sendEvents = [];
+
+    User.findById(req.params.id,(err, user) => {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-user-failed'});
         }else{
+            let count =0, length = user.events.length;
             for (let eventId of user.events){
-                Event.findById(eventId,function (err,event) {
-                    if (event !== null){
-                        //console.log('event Id: '+ eventId);
-                        //console.log('event object: '+event);
-                        // console.log( event.startDate," , "+ new Date(event.startDate));
-                        // console.log('event year： '+ event.startDate.getFullYear() +" event month: "+event.startDate.getMonth());
-                        console.log('event year: '+ parseInt(event.startDate.getFullYear())+" event month: "+parseInt(event.startDate.getMonth()));
-                        console.log('equal year: '+ parseInt(event.startDate.getFullYear()) === year +" equal month: "+parseInt( event.startDate.getMonth()) === month);
-                        if (parseInt(event.startDate.getFullYear()) === year && parseInt(event.startDate.getMonth()) === month){
-                            events.push(event);
-                            console.log(events);
-                        }
-                    }
+                 Event.findById(eventId, (err,event) => {
+                     if (err){
+                         console.log(err);
+                         res.status(400).send({'msg':'find-event-failed'});
+                     }else{
+                         let obj = {};
+                         if (event !== null){
+                             if (parseInt(event.startDate.getFullYear()) === year && parseInt(event.startDate.getMonth()) === month){
+                                 Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
+                                 sendEvents.push(event);
+                             }
+                         }
+                     }
+                     count++;
                 });
             }
+            deasync.loopWhile(() => count < length);
             res.status(200).send(
                 JSON.stringify({
-                    events:events
+                    sendEvents
                 })
             );
         }
     });
 });
-
 
 /* a logged user create event*/
 app.post('/user/event',function (req,res) {
