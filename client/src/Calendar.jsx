@@ -1,18 +1,40 @@
 import React, { Component } from 'react';
 import './Calendar.css';
 
+// Component
+import DayCell from './DayCell';
+
 // Date calculator
 import cal from './script/dateCalculator.js';
 
 class Calendar extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			isPopupAddOpen: false,
+			isPopupEditOpen: false
+		}
+
+		this.screenEvents = this.screenEvents.bind(this);
 		this.generateGrid = this.generateGrid.bind(this);
+	}
+
+	screenEvents(allEvents, currentDate, day) {
+		let events = [];
+
+		for (let event of allEvents) {
+			if ( cal.withinDate( currentDate, event.startDate, event.endDate, day ) ) {
+				events.push(event);
+			}
+		}
+
+		return events; 
 	}
 
 	generateGrid() {
 		let grid = [];
 		let currentDate = this.props.currentDate;
+		let allEvents = this.props.allEvents;
 
 		for (let col = 0; col < cal.column(currentDate); ++col) {
 			let rows = [];
@@ -22,12 +44,16 @@ class Calendar extends Component {
 				let day = cellIndex - cal.firstDay(currentDate) + 1;
 
 				rows.push(
-					<div className={ `day-cell ${ day <= 0 || day > cal.monthDays(currentDate) ? 'cell-disabled' : '' }` } key={row}>{ day <= 0 || day > cal.monthDays(currentDate) ? '' : day }</div>
+					<DayCell day={ day }
+							 currentDate={ currentDate }
+							 ymd={ [currentDate.getFullYear(), currentDate.getMonth(), day] }
+							 events={ this.screenEvents(allEvents, currentDate, day) } 
+							 key={ row } />
 				);
 			}
 
 			grid.push (
-				<div className="day-col" key={col}>
+				<div className="day-col" key={ col }>
 					{ rows }
 				</div>
 			);
@@ -38,7 +64,6 @@ class Calendar extends Component {
 
 	render() {
 		const grid = this.generateGrid();
-		console.log(cal.column(this.props.currentDate));
 
 		return (
 			<main>
@@ -54,6 +79,7 @@ class Calendar extends Component {
 				<div className="grid">
 					{ grid }
 				</div>
+
 			</main>
 		);
 	}
