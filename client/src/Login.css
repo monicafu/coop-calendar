@@ -51,10 +51,47 @@
 	outline: none;
 	background: none;
 	color: #202020;
+	font-family: 'Noto Sans', sans-serif;
 	font-size: 14px;
 	transition: .2s;
 }
 
 .tab-container input:focus {
 	border-bottom: 2px solid #202020;
+}
+
+.tab-container button {
+	display: flex;
+	justify-content: center;
+	padding: 3px 5px;
+	margin: 5px 0;
+	border: none;
+	border-radius: 5px;
+	color: #202020;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 14px;
+	/*font-weight: bold;*/
+	cursor: pointer;
+}
+
+.tab-container .btn-google {
+	justify-content: center;
+	padding: 3px 5px;
+	margin: 5px 0;
+	border: 1px solid #f1f1f1;
+	border-radius: 5px;
+	text-decoration: none;
+	text-align: center;
+	color: #202020;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 14px;
+	/*font-weight: bold;*/
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.tab-container img {
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
 }

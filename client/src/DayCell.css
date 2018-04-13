@@ -78,10 +78,13 @@
 	display: flex;
 	flex: none;
 	width: 95%;
-	padding: 0 5px;
+	padding: 1px 7px;
 	margin: 1px 0;
 	border-radius: 5px;
 	font-size: 12px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 	cursor: pointer;
 }
 

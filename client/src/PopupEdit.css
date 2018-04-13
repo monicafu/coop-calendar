@@ -70,18 +70,39 @@
 	border: 2px solid #202020;
 }
 
+.popup-edit .btn-save {
+	align-self: center;
+	width: 100px;
+	padding: 3px 5px;
+	border: none;
+	border-radius: 5px;
+	outline: none;
+	background-color: #b7d7d9;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+	transition: .2s;
+}
+
+.popup-edit .btn-save:hover {
+	background-color: #a4c1c3;
+}
+
 /* date-form
 -------------  */
 
 .popup-edit .date-form {
 	display: flex;
-	justify-content: space-between;
+	flex-direction: row;
+	justify-content: flex-start;
 }
 
-.date-form input {
-	display: flex;
-	width: 30%;
+.popup-edit .date-connector {
+	margin: 0 15px;
 }
+
 
 /* Toggle button
 ------------------ */

@@ -11,11 +11,16 @@ import Login from './Login';
 // Date calculator
 import cal from './script/dateCalculator.js';
 
+// Test data
+import testEvents from './test/events.js';
+
 class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			currentDate: cal.today(),
+			currentUser: {},
+			events: testEvents,
 			searchContent: null,
 			isLogin: false,
 			isPopupAddOpen: false,
@@ -90,7 +95,8 @@ class App extends Component {
 		      		clickLogin={ this.toggleLogin } />
 		      	<Calendar
 		      		currentDate={ this.state.currentDate }
-		      		today={ this.state.today } />
+		      		today={ this.state.today }
+		      		allEvents={ this.state.events } />
 		      	<Modal>
 		      		{ this.state.isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } /> : null }
 		      	</Modal>

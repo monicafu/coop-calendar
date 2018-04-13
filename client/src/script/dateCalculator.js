@@ -52,6 +52,23 @@ const compareToday = (day, date) => {
 	return false;
 }
 
+const checkWithinDate = (currentDate, startDate, endDate, day) => {
+	if (  checkWithinMonth(currentDate, startDate, endDate) && day >= startDate.getDate() && day <= endDate.getDate() ) {
+		return true;
+	}
+
+	return false;
+}
+
+const checkWithinMonth = (currentDate, startDate, endDate) => {
+	if ( currentDate.getFullYear() >= startDate.getFullYear() && currentDate.getFullYear() <= endDate.getFullYear() &&
+		 currentDate.getMonth() >= startDate.getMonth() &&  currentDate.getMonth() <= endDate.getMonth() ) {
+		return true;
+	}
+
+	return false;
+}
+
 
 // Interface
 const calculator = {
@@ -75,7 +92,10 @@ const calculator = {
 	},
 	isToday: (day, date) => {
 		return compareToday(day, date);
-	}
+	},
+	withinDate: (currentDate, startDate, endDate, day) => {
+		return checkWithinDate(currentDate, startDate, endDate, day);
+	},
 };
 
 export default calculator;

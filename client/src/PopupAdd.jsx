@@ -1,10 +1,46 @@
 import React, { Component } from 'react';
 import './PopupAdd.css';
 
+// Date picker
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
+
 class PopupAdd extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			event: {
+				title: '',
+				description: '',
+				startDate: undefined,
+				endDate: undefined,
+				category: 'private',
+				location: '',
+			},
+		}
+	}
+
+	handleStartDayChange(selectedDay) {
+		let event = this.state.event;
+		event.startDate = selectedDay;
+
+		this.setState({
+			event,
+		});
+	}
+
+	handleEndDayChange(selectedDay) {
+		let event = this.state.event;
+		event.endDate = selectedDay;
+
+		this.setState({
+			event,
+		});
+	}
 
 	render() {
 		const date = this.props.date;
+		const event = this.state.event;
 
 		return (
 			<div className="popup-add" >
@@ -14,20 +50,12 @@ class PopupAdd extends Component {
 						<label htmlFor="title">Title</label>
 						<input id="title" type="text" placeholder="For what" />
 					</div>
-					<div className="field date">
-						<label htmlFor="start-date">Start Date</label>
+					<div className="field">
+						<label>Date</label>
 						<div className="date-form">
-							<input id="start-date" type="number" name="year" placeholder="Year" defaultValue={ date ? date[0] : null } />
-							<input type="number" placeholder="Month" defaultValue={ date ? date[1] + 1 : null } />
-							<input type="number" name="day" placeholder="Day" defaultValue={ date ? date[2] : null } />
-						</div>
-					</div>
-					<div className="field date">
-						<label htmlFor="end-date">End Date</label>
-						<div className="date-form">
-							<input id="end-date" type="number" name="year" placeholder="Year" defaultValue={ date ? date[0] : null } />
-							<input type="number" name="month" placeholder="Month" defaultValue={ date ? date[1] +1 : null } />
-							<input type="number" name="day" placeholder="Day" defaultValue={ date ? date[2] : null } />
+							<DayPickerInput value={ event.startDate } onDayChange={ this.handleStartDayChange } />
+							<span className="date-connector">to</span>
+							<DayPickerInput value={ event.endDate } onDayChange={ this.handleEndDayChange } />
 						</div>
 					</div>
 					<div className="field">
@@ -48,6 +76,9 @@ class PopupAdd extends Component {
 					<div className="field">
 						<label htmlFor="note">Note</label>
 						<textarea id="note" type="text" placeholder="Note" />
+					</div>
+					<div className="field">
+						<button className="btn-add">Add Event</button>
 					</div>
 				</div>
 			</div>
