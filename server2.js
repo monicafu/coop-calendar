@@ -5,8 +5,8 @@ const express   = require('express'),
     app       = express(),
     mongoose = require('mongoose'),
     //cookieSession = require('cookie-session'),
-    keys = require('./config/keys'),
-    PORT     = process.env.PORT || 5000,
+    env = require('./env.json'),
+    PORT     = env.SERVER_PORT,
     passport = require('passport'),
     crypto = require('crypto'),
     LocalStrategy = require("passport-local"),
@@ -18,7 +18,7 @@ app.use( bodyParser.json({ extended: true, type: '*/*' }) );
 //const jsonParser = bodyParser.json({extended: true, type: '*/*'});
 
 // --- db connection ---
-mongoose.connect('mongodb://localhost/calendar');
+mongoose.connect(`mongodb://${env.DB_HOST}/calendar`);
 const User = require('./models/user');
 const Event = require('./models/event');
 
@@ -61,7 +61,7 @@ const {isLoggedIn,checkUserEvent} = require('./middleware.js');
 
 // ---      encryption function   ---
 function cryptPwd(password) {
-    const salt = 'abc';
+    const salt = env.salt;
     const saltPassword = password + ':' + salt;
     const md5 = crypto.createHash('md5');
     return md5.update(saltPassword).digest('hex');

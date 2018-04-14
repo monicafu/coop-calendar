@@ -1,3 +1,4 @@
+
 export const getUserEvents = async (url) => {
     try{
         let res = await fetch(url,{
