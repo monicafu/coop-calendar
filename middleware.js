@@ -1,8 +1,12 @@
 const middleware = {
     isLoggedIn: (req, res, next) => {
+        console.log(req.isAuthenticated());
         //verify if user is logging
-        if (req.isAuthenticated()) {
-            return next();
+        // if (req.isAuthenticated()) {
+        //     return next();
+        // }
+        if (req) {
+            return true;
         }
         //req.flash("error", "You must be signed in to do that!");
         res.status(400).send(

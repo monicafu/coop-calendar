@@ -18,9 +18,17 @@
   },
   "homepage": "https://github.com/seainfo6250/project-malachite#readme",
   "dependencies": {
+    "async": "^2.6.0",
     "connect-flash": "^0.1.1",
+    "cookie-session": "^2.0.0-beta.3",
+    "crypto": "^1.0.1",
+    "deasync": "^0.1.12",
     "express": "^4.16.3",
-    "mongoose": "^5.0.12",
-    "passport": "^0.4.0"
+    "mongoose": "^5.0.14",
+    "passport": "^0.4.0",
+    "passport-google": "^0.3.0",
+    "passport-google-oauth": "^1.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^5.0.0"
   }
 }
