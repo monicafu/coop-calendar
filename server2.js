@@ -261,9 +261,6 @@ app.put('/user/event/:id',function (req,res) {
            console.log(err);
            res.status(400).send({'msg':'find-event-failed'});
        }else{
-           // console.log("find event:"+ event);
-           // console.log("username: " + event.creator.username);
-           // console.log("current user: " + currentUser.name);
            if (event.creator.username === currentUser.name || event.visibility === 'private'){
                Event.findByIdAndUpdate(req.params.id,req.body.event,function (err, event) {
                    if (err){
@@ -302,10 +299,18 @@ app.delete('/user/event/:id', function (req,res) {
             console.log(err);
             res.status(400).send({'msg':'find-event-failed'});
         }else{
-            // console.log("find event:"+ event);
-            // console.log("username: " + event.creator.username);
-            // console.log("current user: " + currentUser.name);
             if (event.creator.username === currentUser.name || event.visibility === 'private'){
+                User.findById(event.creator.id,function (err,user) {
+                    if (err){
+                        console.log(err);
+                    }else{
+                        for (let eventId of user.events){
+                            const index = user.events.indexOf(eventId);
+                            user.events.splice(index,1);
+                            user.save();
+                        }
+                    }
+                });
                 Event.findByIdAndRemove(req.params.id,function (err) {
                     if (err){
                         console.log(err);
