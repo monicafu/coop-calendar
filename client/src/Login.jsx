@@ -94,7 +94,7 @@ class Login extends Component {
 				loginLoading: true,
 			});
 
-			userLogin('http://localhost:5000/login', loginInfo)
+			userLogin('login', loginInfo)
 			.then( result => {                // need to be dealt with
 				if ( result.isLogin ) {
 					this.props.closePage();

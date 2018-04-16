@@ -21,7 +21,7 @@ class App extends Component {
 		this.state = {
 			currentDate: cal.today(),
 			currentUser: {},
-			events: testEvents,
+			events: [],
 			searchContent: '',
 			isLoginOpen: false,
 			isPopupAddOpen: false,
@@ -62,15 +62,17 @@ class App extends Component {
 	getEvents() {
 		const { currentDate, currentUser } = this.state;
 
-		getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
-		.then(result => {
-			this.setState({
-				events: result,
+		if ( currentUser.id ) {
+			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
+			.then(result => {
+				this.setState({
+					events: result,
+				});
+			})
+			.catch(error => {
+				console.log(error);
 			});
-		})
-		.catch(error => {
-			console.log(error);
-		});
+		}
 	}
 
 	pageUp() {
