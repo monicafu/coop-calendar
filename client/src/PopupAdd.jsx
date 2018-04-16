@@ -65,8 +65,6 @@ class PopupAdd extends Component {
 					updateEvents();
 					closePopup();
 				}
-
-				this.resetLoading();
 			})
 			.catch( error => {
 				console.log(error);

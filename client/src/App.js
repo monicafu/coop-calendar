@@ -43,9 +43,11 @@ class App extends Component {
 	}
 
 	login(user) {
+		console.log( user );
 		this.setState({
 			currentUser: user,
 		});
+		this.getEvents();
 	}
 
 	logout() {
@@ -61,6 +63,8 @@ class App extends Component {
 
 	getEvents() {
 		const { currentDate, currentUser } = this.state;
+		console.log( currentUser.userId );
+		console.log(currentUser.userId);
 
 		if ( currentUser.id ) {
 			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
@@ -135,9 +139,7 @@ class App extends Component {
 		      		clickRight={ this.pageDown }
 		      		clickToday={ this.jumpToday }
 		      		clickAdd={ this.togglePopupAdd }
-		      		clickLogin={ this.toggleLogin }
-		      		userLogin={ this.login }
-		      		userLogout={ this.logout } />
+		      		clickLogin={ this.toggleLogin } />
 		      	<Calendar
 		      		currentDate={ currentDate }
 		      		currentUser={ currentUser }
@@ -145,7 +147,7 @@ class App extends Component {
 		      		updateEvents={ this.getEvents } />
 		      	<Modal>
 		      		{ isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } updateEvents={ this.getEvents } /> : null }
-					{ isLoginOpen ? <Login closePage={ this.toggleLogin } /> : null }
+					{ isLoginOpen ? <Login login={ this.login } closePage={ this.toggleLogin } /> : null }
 				</Modal>
 	      	</div>
 	    );

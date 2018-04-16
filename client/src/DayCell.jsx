@@ -89,7 +89,7 @@ class DayCell extends Component {
 			<div className={ classList } data-ymd={ dataYmd } >
 				{ dayContent }
 				<Modal>
-	      			{ this.state.isPopupAddOpen ? <PopupAdd date={ ymd } closePopup={ this.togglePopupAdd } /> : null }
+	      			{ this.state.isPopupAddOpen ? <PopupAdd date={ ymd } updateEvents={ updateEvents } closePopup={ this.togglePopupAdd } /> : null }
 	      			{ this.state.isPopupEditOpen ? <PopupEdit user={ currentUser } event={ currentEvent } updateEvents={ updateEvents } closePopup={ this.togglePopupEdit } /> : null }
 	      		</Modal>
 			</div>

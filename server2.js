@@ -134,6 +134,7 @@ app.post('/register', (req, res ) =>  {
                 if(err) {
                     console.log(err);
                 }
+
                 // if the user has existed
                 if (data) {
                     res.status(200).send({msg:'The username has existed',isRegister:false});
