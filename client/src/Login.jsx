@@ -44,6 +44,8 @@ class Login extends Component {
 		this.handleInput = this.handleInput.bind(this);
 		this.handleLogin = this.handleLogin.bind(this);
 		this.handleSignup = this.handleSignup.bind(this);
+		this.resetLoginInput = this.resetLoginInput.bind(this);
+		this.resetSignupInput = this.resetSignupInput.bind(this);
 		this.resetLoading = this.resetLoading.bind(this);
 	}
 
@@ -76,6 +78,7 @@ class Login extends Component {
 
 	handleLogin() {
 		const { loginInfo, loginWarning } = this.state;
+		const { login, closePage } = this.props;
 
 		if ( check.empty( loginInfo.username ) || check.empty( loginInfo.password ) ) {
 			if ( check.empty( loginInfo.username ) ) {
@@ -97,7 +100,11 @@ class Login extends Component {
 			userLogin('login', loginInfo)
 			.then( result => {                // need to be dealt with
 				if ( result.isLogin ) {
-					this.props.closePage();
+					login( { 
+						id: result.userId,
+						username: result.username,
+						} );
+					closePage();
 				}
 			})
 			.catch( error => {
@@ -144,6 +151,7 @@ class Login extends Component {
 						tabIndex: 0,
 					});
 				}
+				this.resetLoading();
 			})
 			.catch( error => {
 				console.log(error);
@@ -151,6 +159,25 @@ class Login extends Component {
 			} );
 		}
 
+	}
+
+	resetLoginInput() {
+		this.setState({
+			loginInfo: {
+				username: '',
+				password: '',
+			},
+		});
+	}
+
+	resetSignupInput() {
+		this.setState({
+			signupInfo: {
+				username: '',
+				password: '',
+				vpassword: '',
+			},
+		});
 	}
 
 	resetLoading() {
@@ -188,7 +215,7 @@ class Login extends Component {
 								</div>
 								<div className="field">
 									<button onClick={ this.handleLogin } >{ loginLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Log In' }</button>
-									<a className="btn-google" href="http://localhost:8000/auth/google"><img src={ google } alt="google" />Google</a>
+									<a className="btn-google" href="http://localhost:5000/auth/google"><img src={ google } alt="google" />Google</a>
 								</div>
 							</div>
 						</TabPanel>
