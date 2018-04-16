@@ -59,6 +59,8 @@ class PopupAdd extends Component {
 				loading: true,
 			});
 
+			console.log(event);
+
 			createEvent('user/event', event)
 			.then( result => {
 				if ( result.isCreated ) {
@@ -176,7 +178,7 @@ class PopupAdd extends Component {
 					</div>
 					<div className="field">
 						<label htmlFor="location">Location</label>
-						<input id="location" type="text" placeholder="Where it happens" onChange={ this.handleInput } />
+						<input id="location" type="text" name="location" placeholder="Where it happens" onChange={ this.handleInput } />
 					</div>
 					<div className="field">
 						<label>Publicity</label>
