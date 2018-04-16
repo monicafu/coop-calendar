@@ -96,7 +96,7 @@ class Login extends Component {
 
 			userLogin('http://localhost:5000/login', loginInfo)
 			.then( result => {                // need to be dealt with
-				if ( result.msg = 'success' ) {
+				if ( result.isLogin ) {
 					this.props.closePage();
 				}
 			})
@@ -139,7 +139,7 @@ class Login extends Component {
 
 			userSignup('http://localhost:5000/register', signupInfo)
 			.then( result => {
-				if ( result.msg = '' ) {
+				if ( result.isRegister ) {
 					this.setState({
 						tabIndex: 0,
 					});

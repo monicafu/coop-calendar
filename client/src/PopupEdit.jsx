@@ -30,17 +30,18 @@ class PopupEdit extends Component {
 		this.handleStartDayChange = this.handleStartDayChange.bind(this);
 		this.handleEndDayChange = this.handleEndDayChange.bind(this);
 		this.resetLoading = this.resetLoading.bind(this);
+		this.resetWarning = this.resetWarning.bind(this);
 	}
 
 	handleEditEvent() {
 		let { event, warning } = this.state;
 		const { user, updateEvents, closePopup } = this.props;
 
-		if ( check.empty(warning.title) || check.empty(warning.date) ) {
-			if ( check.empty(warning.title) ) {
+		if ( check.empty(event.title) || check.empty(event.date) ) {
+			if ( check.empty(event.title) ) {
 				warning.title = 'Title can not be empty';
 			}
-			if ( check.empty(warning.date) ) {
+			if ( check.empty(event.date) ) {
 				warning.date = 'Start Date and End Date can not be empty';
 			}
 
@@ -55,7 +56,7 @@ class PopupEdit extends Component {
 
 			editEvent(`user/event/${ user.id }`, event)
 			.then( result => {
-				if ( result.isUpdated === true ) {
+				if ( result.isUpdatede ) {
 					updateEvents();
 					closePopup();
 				}
@@ -74,7 +75,7 @@ class PopupEdit extends Component {
 
 		deleteEvent(`user/event/${ user.id }`)
 		.then( result => {
-			if ( result.isDeleted === true ) {
+			if ( result.isDeleted ) {
 				updateEvents();
 				closePopup();
 			}
@@ -88,6 +89,8 @@ class PopupEdit extends Component {
 	}
 
 	handleInput(evt) {
+		this.resetWarning();
+
 		let event = this.state.event;
 		event[evt.target.name] = evt.target.value;
 
@@ -106,7 +109,20 @@ class PopupEdit extends Component {
 	}
 
 	handleStartDayChange(selectedDay) {
-		let event = this.state.event;
+		this.resetWarning();
+
+		let { event, warning } = this.state;
+
+		if ( check.chronologic( selectedDay, event.endDate ) ) {
+			warning.date = 'End Date can not precede Start Date';
+			event.startDate = event.endDate;
+			this.setState({
+				event,
+				warning,
+			});
+
+			return ;
+		}
 		event.startDate = selectedDay;
 
 		this.setState({
@@ -115,7 +131,20 @@ class PopupEdit extends Component {
 	}
 
 	handleEndDayChange(selectedDay) {
-		let event = this.state.event;
+		this.resetWarning();
+
+		let { event, warning } = this.state;
+
+		if ( check.chronologic( event.startDate, selectedDay ) ) {
+			warning.date = 'End Date can not precede Start Date';
+			event.endDate = event.startDate;
+			this.setState({
+				event,
+				warning,
+			});
+
+			return ;
+		}
 		event.endDate = selectedDay;
 
 		this.setState({
@@ -127,6 +156,15 @@ class PopupEdit extends Component {
 		this.setState({
 			editLoading: false,
 			deleteLoading: false,
+		});
+	}
+
+	resetWarning() {
+		this.setState({
+			warning: {
+				title: '',
+				date: '',
+			}
 		});
 	}
 

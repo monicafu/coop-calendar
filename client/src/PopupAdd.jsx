@@ -35,17 +35,18 @@ class PopupAdd extends Component {
 		this.handleStartDayChange = this.handleStartDayChange.bind(this);
 		this.handleEndDayChange = this.handleEndDayChange.bind(this);
 		this.resetLoading = this.resetLoading.bind(this);
+		this.resetWarning = this.resetWarning.bind(this);
 	}
 
 	handleAddEvent() {
 		let { event, warning } = this.state;
 		const { closePopup, updateEvents } = this.props;
 
-		if ( check.empty(warning.title) || check.empty(warning.date) ) {
-			if ( check.empty(warning.title) ) {
+		if ( check.empty(event.title) || check.empty(event.date) ) {
+			if ( check.empty(event.title) ) {
 				warning.title = 'Title can not be empty';
 			}
-			if ( check.empty(warning.date) ) {
+			if ( check.empty(event.date) ) {
 				warning.date = 'Start Date and End Date can not be empty';
 			}
 
@@ -60,7 +61,7 @@ class PopupAdd extends Component {
 
 			createEvent('user/event', event)
 			.then( result => {
-				if ( result.isCreated === true ) {
+				if ( result.isCreated ) {
 					updateEvents();
 					closePopup();
 				}
@@ -75,6 +76,8 @@ class PopupAdd extends Component {
 	}
 
 	handleInput(evt) {
+		this.resetWarning();
+
 		let event = this.state.event;
 		event[evt.target.name] = evt.target.value;
 
@@ -93,7 +96,21 @@ class PopupAdd extends Component {
 	}
 
 	handleStartDayChange(selectedDay) {
-		let event = this.state.event;
+		this.resetWarning();
+
+		let { event, warning } = this.state;
+
+		if ( check.chronologic( selectedDay, event.endDate ) ) {
+			warning.date = 'End Date can not precede Start Date';
+			event.startDate = event.endDate;
+			this.setState({
+				event,
+				warning,
+			});
+
+			return ;
+		}
+
 		event.startDate = selectedDay;
 
 		this.setState({
@@ -102,7 +119,21 @@ class PopupAdd extends Component {
 	}
 
 	handleEndDayChange(selectedDay) {
-		let event = this.state.event;
+		this.resetWarning();
+
+		let { event, warning } = this.state;
+
+		if ( check.chronologic( event.startDate, selectedDay ) ) {
+			warning.date = 'End Date can not precede Start Date';
+			event.endDate = event.startDate;
+			this.setState({
+				event,
+				warning,
+			});
+
+			return ;
+		}
+
 		event.endDate = selectedDay;
 
 		this.setState({
@@ -113,6 +144,15 @@ class PopupAdd extends Component {
 	resetLoading() {
 		this.setState({
 			loading: false,
+		});
+	}
+
+	resetWarning() {
+		this.setState({
+			warning: {
+				title: '',
+				date: '',
+			}
 		});
 	}
 
