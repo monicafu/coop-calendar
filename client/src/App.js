@@ -69,8 +69,9 @@ class App extends Component {
 		if ( currentUser.id ) {
 			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
 			.then(result => {
+				console.log(result);
 				this.setState({
-					events: result,
+					events: result.sendEvents,
 				});
 			})
 			.catch(error => {
