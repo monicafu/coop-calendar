@@ -13,6 +13,7 @@ main {
 	display: flex;
 	flex: none;
 	padding-bottom: 8px;
+	color: #797979;
 }
 
 .week-cell {

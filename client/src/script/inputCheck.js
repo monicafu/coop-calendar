@@ -1,15 +1,27 @@
 
-const checkPwordc = (pwc, pw) => {
-	if ( pwc === pw ) {
+
+const checkEmptyInput = (input) => {
+	if ( input === '' ) {
 		return true;
 	}
 
 	return false;
-}
+};
+
+const checkVPword = (vpword, pword) => {
+	if ( vpword === pword ) {
+		return true;
+	}
+
+	return false;
+};
 
 const check = {
-	pwordc: (pwc, pw) => {
-		return checkPwordc(pwc, pw); 
+	empty: (input) => {
+		return checkEmptyInput(input);
+	},
+	vpword: (vpword, pword) => {
+		return checkVPword(vpword, pword); 
 	},
 };
 

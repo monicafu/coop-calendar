@@ -8,8 +8,9 @@ import Modal from './Modal';
 import PopupAdd from './PopupAdd';
 import Login from './Login';
 
-// Date calculator
+// Functions
 import cal from './script/dateCalculator.js';
+import { getUserEvents } from './script/fetchService.js';
 
 // Test data
 import testEvents from './test/events.js';
@@ -21,12 +22,14 @@ class App extends Component {
 			currentDate: cal.today(),
 			currentUser: {},
 			events: testEvents,
-			searchContent: null,
-			isLogin: false,
+			searchContent: '',
+			isLoginOpen: false,
 			isPopupAddOpen: false,
-			isPopupEditOpen: false,
 		};
 
+		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
+		this.getEvents = this.getEvents.bind(this);
 		this.pageUp = this.pageUp.bind(this);
 		this.pageDown = this.pageDown.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -39,16 +42,49 @@ class App extends Component {
 		window.addEventListener('keydown', this.handleKeyDown);
 	}
 
+	login(user) {
+		this.setState({
+			currentUser: user,
+		});
+	}
+
+	logout() {
+		this.setState({
+			currentDate: cal.today(),
+			currentUser: {},
+			events: [],
+			searchContent: '',
+			isLoginOpen: false,
+			isPopupAddOpen: false,
+		});
+	}
+
+	getEvents() {
+		const { currentDate, currentUser } = this.state;
+
+		getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
+		.then(result => {
+			this.setState({
+				events: result,
+			});
+		})
+		.catch(error => {
+			console.log(error);
+		});
+	}
+
 	pageUp() {
 		this.setState( prevState => ({
 			currentDate: cal.previousMonth(prevState.currentDate),
 		}));
+		this.getEvents();
 	}
 
 	pageDown() {
 		this.setState( prevState => ({
 			currentDate: cal.nextMonth(prevState.currentDate),
 		}));
+		this.getEvents();
 	}
 
 	handleKeyDown(event) {
@@ -67,6 +103,7 @@ class App extends Component {
 			currentDate: cal.today()
 		}));
 		event.target.blur();
+		this.getEvents();
 	}
 
 	togglePopupAdd() {
@@ -78,30 +115,35 @@ class App extends Component {
 
 	toggleLogin() {
 		this.setState( prevState => ({
-			isLogin: !prevState.isLogin,
+			isLoginOpen: !prevState.isLoginOpen,
 		}))
 	}
 
   	render() {
+  		const { currentDate, currentUser, events } = this.state;
+  		const { isLoginOpen, isPopupAddOpen } = this.state;
+
     	return (
       		<div className="App">
 		      	<Header 
-		      		currentMonth={ this.state.currentDate.getMonth() }
-		      		currentYear={ this.state.currentDate.getFullYear() }
+		      		currentMonth={ currentDate.getMonth() }
+		      		currentYear={ currentDate.getFullYear() }
+		      		currentUser={ currentUser }
 		      		clickLeft={ this.pageUp }
 		      		clickRight={ this.pageDown }
 		      		clickToday={ this.jumpToday }
 		      		clickAdd={ this.togglePopupAdd }
-		      		clickLogin={ this.toggleLogin } />
+		      		clickLogin={ this.toggleLogin }
+		      		userLogin={ this.login }
+		      		userLogout={ this.logout } />
 		      	<Calendar
-		      		currentDate={ this.state.currentDate }
-		      		today={ this.state.today }
-		      		allEvents={ this.state.events } />
+		      		currentDate={ currentDate }
+		      		currentUser={ currentUser }
+		      		allEvents={ events }
+		      		updateEvents={ this.getEvents } />
 		      	<Modal>
-		      		{ this.state.isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } /> : null }
-		      	</Modal>
-				<Modal>
-					{ this.state.isLogin ? <Login closePage={ this.toggleLogin } /> : null }
+		      		{ isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } updateEvents={ this.getEvents } /> : null }
+					{ isLoginOpen ? <Login closePage={ this.toggleLogin } /> : null }
 				</Modal>
 	      	</div>
 	    );
