@@ -137,7 +137,7 @@ class Login extends Component {
 				signupLoading: true,
 			});
 
-			userSignup('http://localhost:5000/register', signupInfo)
+			userSignup('register', signupInfo)
 			.then( result => {
 				if ( result.isRegister ) {
 					this.setState({
