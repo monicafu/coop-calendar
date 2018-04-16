@@ -4,58 +4,173 @@ import 'react-tabs/style/react-tabs.css';
 
 // Component
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import MDSpinner from 'react-md-spinner';
 
 // Assets
 import google from './icon/icon-google.svg';
 
-// Check functions
+// Functions
 import check from './script/inputCheck.js';
+import { userLogin, userSignup } from './script/fetchService.js';
+
 
 class Login extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			userLogin: {
+			loginInfo: {
+				username: '',
+				password: '',
+			},
+			signupInfo: {
+				username: '',
+				password: '',
+				vpassword: '',
+			},
+			loginWarning: {
 				uname: '',
 				pword: '',
 			},
-			userSignup: {
+			signupWarning: {
 				uname: '',
 				pword: '',
-				pwordc: '',
+				vpword: '',
 			},
+			loginLoading: false,
+			signupLoading: false,
+			tabIndex: 0,
 		};
 
 		this.handleInput = this.handleInput.bind(this);
+		this.handleLogin = this.handleLogin.bind(this);
+		this.handleSignup = this.handleSignup.bind(this);
+		this.resetLoading = this.resetLoading.bind(this);
 	}
 
 	handleInput(evt) {
-		let { userLogin, userSignup } = this.state;
+		let { loginInfo, signupInfo } = this.state;
 		let sec = evt.target.id.split('-');
 
 		if ( sec[0] === 'login' ) {
-			userLogin[ sec[1] ] = evt.target.value;
+			loginInfo[ sec[1] ] = evt.target.value;
+			this.setState({
+				loginInfo,
+				loginWarning: {
+					uname: '',
+					pword: '',
+				},
+			});
 		}
 		else {
-			userSignup[ sec[1] ] = evt.target.value;
+			signupInfo[ sec[1] ] = evt.target.value;
+			this.setState({
+				signupInfo,
+				signupWarning: {
+					uname: '',
+					pword: '',
+					vpword: '',
+				}
+			});
+		}
+	}
+
+	handleLogin() {
+		const { loginInfo, loginWarning } = this.state;
+
+		if ( check.empty( loginInfo.username ) || check.empty( loginInfo.password ) ) {
+			if ( check.empty( loginInfo.username ) ) {
+				loginWarning.uname = 'Username can not be empty';
+			}
+			if ( check.empty( loginInfo.password ) ) {
+				loginWarning.pword = 'Password can not be empty';
+			}
+
+			this.setState({
+				loginWarning,
+			});
+		}
+		else {
+			this.setState({
+				loginLoading: true,
+			});
+
+			userLogin('http://localhost:5000/login', loginInfo)
+			.then( result => {                // need to be dealt with
+				if ( result.msg = 'success' ) {
+					this.props.closePage();
+				}
+			})
+			.catch( error => {
+				console.log(error);
+				this.resetLoading();
+			});
+		}
+	}
+
+	handleSignup() {
+		const { signupInfo, signupWarning } = this.state;
+
+		if ( check.empty( signupInfo.username ) || check.empty( signupInfo.password ) || check.empty( signupInfo.vpassword ) ) {
+			if ( check.empty( signupInfo.username ) ) {
+				signupWarning.uname = 'Username can not be empty';
+			}
+			if ( check.empty( signupInfo.password) ) {
+				signupWarning.pword = 'Password can not be empty';
+			}
+			if ( check.empty( signupInfo.vpassword ) ) {
+				signupWarning.vpword = 'Please confirm your password';
+			}
+
+			this.setState({
+				signupWarning,
+			})
+		}
+		else if ( !check.vpword( signupInfo.vpassword, signupInfo.password ) ) {
+			signupWarning.vpword = 'Password does not match';
+
+			this.setState({
+				signupWarning,
+			});
+		}
+		else {
+			this.setState({
+				signupLoading: true,
+			});
+
+			userSignup('http://localhost:5000/register', signupInfo)
+			.then( result => {
+				if ( result.msg = '' ) {
+					this.setState({
+						tabIndex: 0,
+					});
+				}
+			})
+			.catch( error => {
+				console.log(error);
+				this.resetLoading();
+			} );
 		}
 
+	}
+
+	resetLoading() {
 		this.setState({
-			userLogin,
-			userSignup,
+			loginLoading: false,
+			signupLoading: false,
 		});
 	}
 
 	render() {
-		const { userLogin, userSignup } = this.state;
-		console.log(userSignup);
-		console.log(userLogin);
+		const { loginInfo, signupInfo } = this.state;
+		const { loginWarning, signupWarning } = this.state;
+		const { loginLoading, signupLoading } = this.state;
+		const { tabIndex } = this.state;
 
 		return (
 			<div className="login-modal">
-				<span className="btn-close-login" onClick={ this.props.closePage }>X</span>
+				<span className="btn-close" onClick={ this.props.closePage }></span>
 				<div className="panel">
-					<Tabs>
+					<Tabs selectedIndex={ tabIndex } onSelect={ tabIndex => this.setState({ tabIndex }) }>
 						<TabList>
 							<Tab>Log In</Tab>
 							<Tab>Sign Up</Tab>
@@ -64,15 +179,15 @@ class Login extends Component {
 						<TabPanel>
 							<div className="tab-container">
 								<div className="field">
-									<label htmlFor="login-uname">Username</label>
-									<input id="login-uname" type="text" placeholder="Username" value={ userLogin.uname } onChange={ this.handleInput } />
+									<label htmlFor="login-username">Username<span className="warning">{ loginWarning.uname }</span></label>
+									<input id="login-username" type="text" placeholder="Username" value={ loginInfo.username } onChange={ this.handleInput } />
 								</div>
 								<div className="field">
-									<label htmlFor="login-pword">Password</label>
-									<input id="login-pword" placeholder="Password" type="password" value={ userLogin.pword } onChange={ this.handleInput } />
+									<label htmlFor="login-password">Password<span className="warning">{ loginWarning.pword }</span></label>
+									<input id="login-password" placeholder="Password" type="password" value={ loginInfo.password } onChange={ this.handleInput } />
 								</div>
 								<div className="field">
-									<button>Login In</button>
+									<button onClick={ this.handleLogin } >{ loginLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Log In' }</button>
 									<a className="btn-google" href="http://localhost:8000/auth/google"><img src={ google } alt="google" />Google</a>
 								</div>
 							</div>
@@ -80,19 +195,19 @@ class Login extends Component {
 						<TabPanel>
 							<div className="tab-container">
 								<div className="field">
-									<label htmlFor="signup-uname">Username</label>
-									<input id="signup-uname" type="text" placeholder="Username" value={ userSignup.uname } onChange={ this.handleInput } />
+									<label htmlFor="signup-uname">Username<span className="warning">{ signupWarning.uname }</span></label>
+									<input id="signup-username" type="text" placeholder="Username" value={ signupInfo.username } onChange={ this.handleInput } />
 								</div>
 								<div className="field">
-									<label htmlFor="signun-pword">Password</label>
-									<input id="signup-pword" type="password" placeholder="Password" value={ userSignup.pword } onChange={ this.handleInput } />
+									<label htmlFor="signun-password">Password<span className="warning">{ signupWarning.pword }</span></label>
+									<input id="signup-password" type="password" placeholder="Password" value={ signupInfo.password } onChange={ this.handleInput } />
 								</div>
 								<div className="field">
-									<label htmlFor="signup-pwordc">Confirm Password</label>
-									<input id="signup-pwordc" type="password" placeholder="Confirm Password" value={ userSignup.pwordc } onChange={ this.handleInput } />
+									<label htmlFor="signup-vpassword">Confirm Password<span className="warning">{ signupWarning.vpword }</span></label>
+									<input id="signup-vpassword" type="password" placeholder="Confirm Password" value={ signupInfo.vpassword } onChange={ this.handleInput } />
 								</div>
 								<div className="field">
-									<button>Sign Up</button>
+									<button onClick={ this.handleSignup }>{ signupLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Sign Up' }</button>
 								</div>
 							</div>
 						</TabPanel>

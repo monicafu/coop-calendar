@@ -41,6 +41,12 @@
 	font-weight: bold;
 }
 
+.popup-add .warning {
+	color: #f22613;
+	margin-left: 20px;
+	font-weight: normal;
+}
+
 .popup-add input {
 	border: none;
 	border-bottom: 2px solid #b1b1b1;

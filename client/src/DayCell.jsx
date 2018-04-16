@@ -20,7 +20,7 @@ class DayCell extends Component {
 
 		this.togglePopupAdd = this.togglePopupAdd.bind(this);
 		this.togglePopupEdit = this.togglePopupEdit.bind(this);
-		this.handleEdit = this.handleEdit.bind(this);
+		this.openEdit = this.openEdit.bind(this);
 	}
 
 	togglePopupAdd() {
@@ -37,17 +37,15 @@ class DayCell extends Component {
 		}));
 	}
 
-	handleEdit(event, evt) {
+	openEdit(event, evt) {
 		this.setState( prevState => ({
 			currentEvent: event,
 		}));
 		this.togglePopupEdit();
 	}
 
-
 	generateDayContent() {
-		const day = this.props.day;
-		let events = this.props.events;
+		const { day, events } = this.props;
 
 		let dayContent = []; 
 
@@ -59,7 +57,7 @@ class DayCell extends Component {
 
 		dayContent = [...dayContent, ...events.map( ( event, index ) => {
 			return (
-				<div className={ `event-bar event-${ event.category }` } onClick={ this.handleEdit.bind(this, event) } key={ index } >
+				<div className={ `event-bar event-${ event.category }` } onClick={ this.openEdit.bind(this, event) } key={ index } >
 					{ event.title }
 				</div>
 			);
@@ -69,11 +67,12 @@ class DayCell extends Component {
 	}
 
 	render() {
+		const { day, currentDate, currentUser, ymd, updateEvents } = this.props;
+		const { currentEvent } = this.state;
+
 		let dayContent = [];
-		const day = this.props.day;
-		const currentDate = this.props.currentDate;
 		let classList = 'day-cell ';
-		let dataYmd = `${ this.props.ymd[0] }-${ this.props.ymd[1] }-${ this.props.ymd[2] }`
+		let dataYmd = `${ ymd[0] }-${ ymd[1] }-${ ymd[2] }`
 
 		if ( day <= 0 || day > cal.monthDays(currentDate) ) {
 			classList += 'cell-disabled ';
@@ -90,8 +89,8 @@ class DayCell extends Component {
 			<div className={ classList } data-ymd={ dataYmd } >
 				{ dayContent }
 				<Modal>
-	      			{ this.state.isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } date={ this.props.ymd } /> : null }
-	      			{ this.state.isPopupEditOpen ? <PopupEdit closePopup={ this.togglePopupEdit } date={ this.props.ymd } event={ this.state.currentEvent } /> : null }
+	      			{ this.state.isPopupAddOpen ? <PopupAdd date={ ymd } closePopup={ this.togglePopupAdd } /> : null }
+	      			{ this.state.isPopupEditOpen ? <PopupEdit user={ currentUser } event={ currentEvent } updateEvents={ updateEvents } closePopup={ this.togglePopupEdit } /> : null }
 	      		</Modal>
 			</div>
 		);
