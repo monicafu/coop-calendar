@@ -57,7 +57,7 @@ class DayCell extends Component {
 
 		dayContent = [...dayContent, ...events.map( ( event, index ) => {
 			return (
-				<div className={ `event-bar event-${ event.category }` } onClick={ this.openEdit.bind(this, event) } key={ index } >
+				<div className={ `event-bar event-${ event.visibility }` } onClick={ this.openEdit.bind(this, event) } key={ index } >
 					{ event.title }
 				</div>
 			);

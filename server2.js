@@ -75,9 +75,10 @@ let currentUser = {};
 // --- Router ---
 // ---      Login         ---//
 app.post('/login', (req, res ) =>  {
-    const user = req.body.username;
-    const pass = req.body.password;
-    //console.log(user + pass);
+	const userInfo = req.body.userInfo
+    const user = userInfo.username;
+    const pass = userInfo.password;
+
     if (user === 'null' || pass === 'null') {
         res.status(200).send({msg:'The input cannot be null', isLogin:false});
     }else{
@@ -115,10 +116,11 @@ app.post('/login', (req, res ) =>  {
 
 app.post('/register', (req, res ) =>  {
     console.log(req.body);
-    const user = req.body.username.toLowerCase();
-    const pass1 = req.body.password;
-    const pass2 = req.body.vpassword;
-    //console.log(user + pass1 + pass2);
+    const userInfo = req.body.userInfo;
+    const user = userInfo.username.toLowerCase();
+    const pass1 = userInfo.password;
+    const pass2 = userInfo.vpassword;
+
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
         res.status(200).send({msg:'The input is not valid', isRegister:false});
     }else{
@@ -186,7 +188,7 @@ app.get('/auth/google/redirect',
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
     const year = parseInt(req.params.year);
-    const month = parseInt(req.params.month) + 1;
+    const month = parseInt(req.params.month);
     let sendEvents = [];
 
     User.findById(req.params.id,(err, user) => {
@@ -203,7 +205,9 @@ app.get('/user/:id/:year/:month',(req, res) => {
                      }else{
                          let obj = {};
                          if (event !== null){
+                         	console.log(event.startDate.getFullYear() + ' ' + event.startDate.getMonth());
                              if (parseInt(event.startDate.getFullYear()) === year && parseInt(event.startDate.getMonth()) === month){
+                                 console.log(event.startDate);
                                  Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
                                  sendEvents.push(event);
                              }
@@ -213,6 +217,8 @@ app.get('/user/:id/:year/:month',(req, res) => {
                 });
             }
             deasync.loopWhile(() => count < length);
+
+            console.log(sendEvents);
             res.status(200).send(
                 JSON.stringify({
                     sendEvents
@@ -224,6 +230,8 @@ app.get('/user/:id/:year/:month',(req, res) => {
 
 /* a logged user create event*/
 app.post('/user/event',function (req,res) {
+	console.log(req.body);
+
     User.findById(currentUser.id,function (err,user) {
         if (err){
             console.log(err);

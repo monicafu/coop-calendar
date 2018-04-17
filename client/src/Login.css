@@ -73,7 +73,7 @@
 .tab-container button {
 	display: flex;
 	justify-content: center;
-	min-height: 24px;
+	min-height: 25px;
 	padding: 3px 5px;
 	margin: 5px 0;
 	border: none;
