@@ -205,9 +205,7 @@ app.get('/user/:id/:year/:month',(req, res) => {
                      }else{
                          let obj = {};
                          if (event !== null){
-                         	console.log(event.startDate.getFullYear() + ' ' + event.startDate.getMonth());
                              if (parseInt(event.startDate.getFullYear()) === year && parseInt(event.startDate.getMonth()) === month){
-                                 console.log(event.startDate);
                                  Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
                                  sendEvents.push(event);
                              }
@@ -218,7 +216,6 @@ app.get('/user/:id/:year/:month',(req, res) => {
             }
             deasync.loopWhile(() => count < length);
 
-            console.log(sendEvents);
             res.status(200).send(
                 JSON.stringify({
                     sendEvents
@@ -230,8 +227,6 @@ app.get('/user/:id/:year/:month',(req, res) => {
 
 /* a logged user create event*/
 app.post('/user/event',function (req,res) {
-	console.log(req.body);
-
     User.findById(currentUser.id,function (err,user) {
         if (err){
             console.log(err);
@@ -265,13 +260,16 @@ app.post('/user/event',function (req,res) {
 
 /* a logged user edit event*/
 app.put('/user/event/:id',function (req,res) {
+	console.log(req.params.id);
+	console.log(req.body.event);
+
     Event.findById(req.params.id,function (err,event) {
        if (err){
            console.log(err);
            res.status(400).send({'msg':'find-event-failed'});
        }else{
            if (event.creator.username === currentUser.name || event.visibility === 'private'){
-               Event.findByIdAndUpdate(req.params.id,req.body.event,function (err, event) {
+               Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
                    if (err){
                        console.log(err);
                        res.status(400).send({'msg':'update-event-failed'});

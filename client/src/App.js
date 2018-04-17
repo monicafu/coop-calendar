@@ -61,8 +61,6 @@ class App extends Component {
 	getEvents() {
 		const { currentDate, currentUser } = this.state;
 		let { events } = this.state;
-		console.log( events );
-		console.log( `user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }` );
 
 		if ( currentUser.id ) {
 			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
@@ -70,6 +68,7 @@ class App extends Component {
 				events = result.sendEvents.map( event => {
 					event.startDate = new Date( event.startDate );
 					event.endDate = new Date( event.endDate );
+					console.log(event);
 					return event;
 				} );
 
