@@ -35,7 +35,7 @@ class PopupEdit extends Component {
 
 	handleEditEvent() {
 		let { event, warning } = this.state;
-		const { user, updateEvents, closePopup } = this.props;
+		const { updateEvents, closePopup } = this.props;
 
 		if ( check.empty(event.title) || check.empty(event.date) ) {
 			if ( check.empty(event.title) ) {
@@ -54,7 +54,9 @@ class PopupEdit extends Component {
 				editLoading: true,
 			});
 
-			editEvent(`user/event/${ user.id }`, event)
+			console.log(event);
+
+			editEvent(`user/event/${ event._id }`, event)
 			.then( result => {
 				if ( result.isUpdatede ) {
 					updateEvents();
@@ -71,9 +73,9 @@ class PopupEdit extends Component {
 	}
 
 	handleDeleteEvent() {
-		const { user, closePopup, updateEvents } = this.props;
+		const { event, closePopup, updateEvents } = this.props;
 
-		deleteEvent(`user/event/${ user.id }`)
+		deleteEvent(`user/event/${ event._id }`)
 		.then( result => {
 			if ( result.isDeleted ) {
 				updateEvents();
