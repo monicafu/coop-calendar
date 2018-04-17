@@ -8,7 +8,9 @@ export const userLogin = async (path, userInfo) => {
     try {
         const res = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify( userInfo ),
+            body: JSON.stringify({
+                userInfo,
+            }),
         });
 
         return await res.json();
@@ -24,7 +26,9 @@ export const userSignup = async (path, userInfo) => {
     try {
         const res = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify( userInfo ),
+            body: JSON.stringify({
+                userInfo,
+            }),
         });
 
         return await res.json();
@@ -55,7 +59,7 @@ export const getUserEvents = async (path) => {
     }
 };
 
-export const createEvent = async (path, id, event) => {
+export const createEvent = async (path, event) => {
     const url = baseUrl + path;
 
     try {
@@ -64,8 +68,7 @@ export const createEvent = async (path, id, event) => {
             Origin: 'http://localhost:5000',
             headers: { 'Accept': 'application/json' },
             body: JSON.stringify({
-                id,
-                event
+                event,
             }),
         });
 

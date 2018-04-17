@@ -171,7 +171,7 @@ class PopupEdit extends Component {
 	render() {
 		const { user, closePopup } = this.props;
 		const { event, warning, editLoading, deleteLoading } = this.state;
-		const isCreator = user.username === event.creator ? true : false;
+		const isCreator = user.username === event.creator.username ? true : false;
 		// const isCreator = true;
 
 		return (
@@ -198,7 +198,7 @@ class PopupEdit extends Component {
 						<div className="field">
 							<label>Publicity</label>
 							<div className="toggle-btn">
-								<input id="publicity-btn" type="checkbox" name="category" checked={ event.category === 'public' ? true : false } onChange={ this.handleCheckbox } />
+								<input id="publicity-btn" type="checkbox" name="visibility" checked={ event.visibility === 'public' ? true : false } onChange={ this.handleCheckbox } />
 								<label className="btn-label" htmlFor="publicity-btn">
 									<span className="circle"></span>
 									<span className="text on">Public</span>
@@ -215,13 +215,13 @@ class PopupEdit extends Component {
 					{ isCreator ? null : (
 						<div className="field">
 							<label htmlFor="creator">Creator</label>
-							<div id="creator" className="creator">{ event.creator }</div>
+							<div id="creator" className="creator">{ event.creator.username }</div>
 						</div>
 						)
 					}
 					<div className="field">
 						<button className="btn-save" onClick={ this.handleEditEvent } >{ editLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Save' }</button>
-						{ isCreator ? <button className="btn-delete" onClick={ this.handleDeleteEvent } >{ deleteLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Save' }</button> : null }
+						{ isCreator ? <button className="btn-delete" onClick={ this.handleDeleteEvent } >{ deleteLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Delete' }</button> : null }
 					</div>
 				</div>
 			</div>

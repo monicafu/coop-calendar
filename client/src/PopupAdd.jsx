@@ -19,7 +19,7 @@ class PopupAdd extends Component {
 				description: '',
 				startDate: props.date ? new Date( props.date[0], props.date[1], props.date[2] ) : undefined,
 				endDate: props.date ? new Date( props.date[0], props.date[1], props.date[2] ) : undefined,
-				category: 'private',
+				visibility: 'private',
 				location: '',
 			},
 			warning: {
@@ -183,7 +183,7 @@ class PopupAdd extends Component {
 					<div className="field">
 						<label>Publicity</label>
 						<div className="toggle-btn">
-							<input id="publicity-btn" type="checkbox" name="category" onChange={ this.handleCheckbox } />
+							<input id="publicity-btn" type="checkbox" name="visibility" checked={ event.visibility === 'public' ? true : false } onChange={ this.handleCheckbox } />
 							<label className="btn-label" htmlFor="publicity-btn">
 								<span className="circle"></span>
 								<span className="text on">Public</span>

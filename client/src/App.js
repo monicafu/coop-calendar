@@ -12,9 +12,6 @@ import Login from './Login';
 import cal from './script/dateCalculator.js';
 import { getUserEvents } from './script/fetchService.js';
 
-// Test data
-import testEvents from './test/events.js';
-
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -43,9 +40,9 @@ class App extends Component {
 	}
 
 	login(user) {
-		console.log( user );
-		this.setState({
-			currentUser: user,
+		this.setState( prevState => {
+			prevState.user = user;
+			return { currentUser: prevState.user };
 		});
 		this.getEvents();
 	}
@@ -63,15 +60,21 @@ class App extends Component {
 
 	getEvents() {
 		const { currentDate, currentUser } = this.state;
-		console.log( currentUser.userId );
-		console.log(currentUser.userId);
+		let { events } = this.state;
+		console.log( events );
+		console.log( `user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }` );
 
 		if ( currentUser.id ) {
 			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
 			.then(result => {
-				console.log(result);
+				events = result.sendEvents.map( event => {
+					event.startDate = new Date( event.startDate );
+					event.endDate = new Date( event.endDate );
+					return event;
+				} );
+
 				this.setState({
-					events: result.sendEvents,
+					events: events,
 				});
 			})
 			.catch(error => {
@@ -81,17 +84,19 @@ class App extends Component {
 	}
 
 	pageUp() {
-		this.setState( prevState => ({
-			currentDate: cal.previousMonth(prevState.currentDate),
-		}));
-		this.getEvents();
+		this.setState( prevState => {
+			let newDate = cal.previousMonth(prevState.currentDate);
+			this.getEvents();
+			return { currentDate: newDate, };
+		});
 	}
 
 	pageDown() {
-		this.setState( prevState => ({
-			currentDate: cal.nextMonth(prevState.currentDate),
-		}));
-		this.getEvents();
+		this.setState( prevState => {
+			let newDate = cal.nextMonth(prevState.currentDate);
+			this.getEvents();
+			return { currentDate: newDate, };
+		});
 	}
 
 	handleKeyDown(event) {
@@ -106,11 +111,12 @@ class App extends Component {
 	}
 
 	jumpToday(event) {
-		this.setState( prevState => ({
-			currentDate: cal.today()
-		}));
+		this.setState( prevState => {
+			prevState.currentDate = cal.today();
+			this.getEvents( prevState.currentDate );
+			return { currentDate: prevState.currentDate, };
+		});
 		event.target.blur();
-		this.getEvents();
 	}
 
 	togglePopupAdd() {
