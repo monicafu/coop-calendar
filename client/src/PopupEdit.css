@@ -84,7 +84,7 @@
 	border: none;
 	border-radius: 5px;
 	outline: none;
-	background-color: #b7d7d9;
+	background-color: #46b29d;
 	font-family: 'Noto Sans', sans-serif;
 	font-size: 14px;
 	font-weight: bold;
@@ -105,7 +105,7 @@
 	border: none;
 	border-radius: 5px;
 	outline: none;
-	background-color: #b7d7d9;
+	background-color: #de5b49;
 	font-family: 'Noto Sans', sans-serif;
 	font-size: 14px;
 	font-weight: bold;
@@ -149,7 +149,7 @@
 	width: 68px;
 	height: 18px;
 	margin: 0;
-	background-color: #bfe9ff;
+	background-color: #324d5c;
 	box-shadow: 0 0 0 2px #ccc;
 	border-radius: 18px;
 	overflow: hidden;
@@ -169,16 +169,17 @@
 .btn-label .text {
 	line-height: 15px;
 	font-size: 12px;
+	font-weight: normal;
 }
 
 .on {
-	color: #797979;
+	color: white;
 	display: none;
 	text-indent: 10px;
 }
 
 .off {
-	color: #797979;
+	color: white;
 	display: inline-block;
 	text-indent: 20px;
 }
@@ -201,5 +202,5 @@
 }
 
 #publicity-btn:checked + .btn-label {
-	background-color: #ffe9cd;
+	background-color: #e37b40;
 }

@@ -32,9 +32,9 @@
 	left: 0;
 	margin: auto;
 	height: 18px;
-	width: 18px;
+	width: 20px;
 	border-radius: 5px;
-	background-color: #b7d7d9;
+	background-color: #f0c14d;
 	z-index: -1;
 }
 
@@ -81,6 +81,7 @@
 	padding: 1px 7px;
 	margin: 1px 0;
 	border-radius: 5px;
+	color: white;
 	font-size: 12px;
 	overflow: hidden;
 	white-space: nowrap;
@@ -89,11 +90,11 @@
 }
 
 .event-private {
-	background-color: #bfe9ff;
+	background-color: #324d5c;
 }
 
 .event-public {
-	background-color: #ffe9cd;
+	background-color: #e37b40;
 }
 
 .event-past {

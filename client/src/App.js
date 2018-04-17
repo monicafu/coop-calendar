@@ -145,7 +145,8 @@ class App extends Component {
 		      		clickRight={ this.pageDown }
 		      		clickToday={ this.jumpToday }
 		      		clickAdd={ this.togglePopupAdd }
-		      		clickLogin={ this.toggleLogin } />
+		      		clickLogin={ this.toggleLogin }
+		      		clickLogout={ this.logout } />
 		      	<Calendar
 		      		currentDate={ currentDate }
 		      		currentUser={ currentUser }

@@ -54,8 +54,6 @@ class PopupEdit extends Component {
 				editLoading: true,
 			});
 
-			console.log(event);
-
 			editEvent(`user/event/${ event._id }`, event)
 			.then( result => {
 				if ( result.isUpdatede ) {
