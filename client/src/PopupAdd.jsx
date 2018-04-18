@@ -21,6 +21,7 @@ class PopupAdd extends Component {
 				endDate: props.date ? new Date( props.date[0], props.date[1], props.date[2] ) : undefined,
 				visibility: 'private',
 				location: '',
+				userId: props.currentUser.id,
 			},
 			warning: {
 				title: '',
@@ -59,7 +60,7 @@ class PopupAdd extends Component {
 				loading: true,
 			});
 
-			console.log(event);
+			console.log( event );
 
 			createEvent('user/event', event)
 			.then( result => {

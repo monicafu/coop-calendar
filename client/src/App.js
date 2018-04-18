@@ -68,7 +68,7 @@ class App extends Component {
 				events = result.sendEvents.map( event => {
 					event.startDate = new Date( event.startDate );
 					event.endDate = new Date( event.endDate );
-					console.log(event);
+					// console.log(event);
 					return event;
 				} );
 
@@ -151,9 +151,10 @@ class App extends Component {
 		      		currentDate={ currentDate }
 		      		currentUser={ currentUser }
 		      		allEvents={ events }
+		      		openLogin={ this.toggleLogin }
 		      		updateEvents={ this.getEvents } />
 		      	<Modal>
-		      		{ isPopupAddOpen ? <PopupAdd closePopup={ this.togglePopupAdd } updateEvents={ this.getEvents } /> : null }
+		      		{ isPopupAddOpen ? <PopupAdd currentUser={ currentUser } closePopup={ this.togglePopupAdd } updateEvents={ this.getEvents } /> : null }
 					{ isLoginOpen ? <Login login={ this.login } closePage={ this.toggleLogin } /> : null }
 				</Modal>
 	      	</div>

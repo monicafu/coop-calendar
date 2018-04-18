@@ -27,9 +27,7 @@ const Header = ( { currentMonth, currentYear, currentUser, clickLeft, clickRight
 					</svg>
 				</div>
 				<div className="tools">
-					<svg onClick={ clickAdd } className="add-icon" fill="#797979" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-					</svg>
+					{ isLogin ?  <div onClick={ clickAdd } className="btn-add">Add Event</div> : null }
 					<div className={ `login ${ isLogin ? '' : 'unlogin' }` }>
 						<div className="dropdown">
 							<div className="login-content">
