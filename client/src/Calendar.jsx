@@ -32,7 +32,7 @@ class Calendar extends Component {
 	}
 
 	generateGrid() {
-		let { currentDate, currentUser, allEvents, updateEvents } = this.props;
+		let { currentDate, currentUser, allEvents, openLogin, updateEvents } = this.props;
 		let grid = [];
 
 		for (let col = 0; col < cal.column(currentDate); ++col) {
@@ -48,6 +48,7 @@ class Calendar extends Component {
 							 currentUser={ currentUser }
 							 ymd={ [currentDate.getFullYear(), currentDate.getMonth(), day] }
 							 events={ this.screenEvents(allEvents, currentDate, day) }
+							 openLogin={ openLogin }
 							 updateEvents={ updateEvents } 
 							 key={ row } />
 				);

@@ -108,15 +108,17 @@ header .panel {
 	align-items: center;
 }
 
-.tools .add-icon {
+.tools .btn-add {
 	display: flex;
-	height: 20px;
+	padding: 2px 5px;
+	margin: 0 8px;
+	border-radius: 5px;
+	color: white;
+	background-color: #b1b1b1;
+	font-size: 10px;
+	font-weight: bold;
 	cursor: pointer;
 	transition: .2s;
-}
-
-.tools .add-icon:hover {
-	fill: #f1f1f1;
 }
 
 
@@ -137,6 +139,8 @@ header .panel {
 .username {
 	position: relative;
 	color: #202020;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 .username::before {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './Login.css';
-import 'react-tabs/style/react-tabs.css';
+// import 'react-tabs/style/react-tabs.css';
 
 // Component
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -213,7 +213,7 @@ class Login extends Component {
 									<label htmlFor="login-password">Password<span className="warning">{ loginWarning.pword }</span></label>
 									<input id="login-password" placeholder="Password" type="password" value={ loginInfo.password } onChange={ this.handleInput } />
 								</div>
-								<div className="field">
+								<div className="field btn-group">
 									<button onClick={ this.handleLogin } >{ loginLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Log In' }</button>
 									<a className="btn-google" href="http://localhost:5000/auth/google"><img src={ google } alt="google" />Google</a>
 								</div>
@@ -233,8 +233,8 @@ class Login extends Component {
 									<label htmlFor="signup-vpassword">Confirm Password<span className="warning">{ signupWarning.vpword }</span></label>
 									<input id="signup-vpassword" type="password" placeholder="Confirm Password" value={ signupInfo.vpassword } onChange={ this.handleInput } />
 								</div>
-								<div className="field">
-									<button onClick={ this.handleSignup }>{ signupLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Sign Up' }</button>
+								<div className="field btn-group">
+									<button onClick={ this.handleSignup }>{ signupLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Create Account' }</button>
 								</div>
 							</div>
 						</TabPanel>
