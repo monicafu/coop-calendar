@@ -205,7 +205,8 @@ app.get('/user/:id/:year/:month',(req, res) => {
                      }else{
                          let obj = {};
                          if (event !== null){
-                             if (parseInt(event.startDate.getFullYear()) === year && parseInt(event.startDate.getMonth()) === month){
+                             if ((year >= parseInt(event.startDate.getFullYear())  &&  year <= parseInt(event.endDate.getFullYear()))
+                                 && (month >= parseInt(event.startDate.getMonth()) && month <= parseInt(event.startDate.getMonth()))){
                                  Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
                                  sendEvents.push(event);
                              }
