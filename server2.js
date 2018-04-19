@@ -115,7 +115,7 @@ app.post('/login', (req, res ) =>  {
 
 
 app.post('/register', (req, res ) =>  {
-    console.log(req.body);
+    // console.log(req.body);
     const userInfo = req.body.userInfo;
     const user = userInfo.username.toLowerCase();
     const pass1 = userInfo.password;
@@ -179,7 +179,7 @@ app.get('/auth/google', passport.authenticate('google',{
 app.get('/auth/google/redirect',
     passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
-        console.log(req.user);
+        // console.log(req.user);
         res.send(req.user);
         //res.redirect('http://localhost:3000');
     });
@@ -261,8 +261,8 @@ app.post('/user/event',function (req,res) {
 
 /* a logged user edit event*/
 app.put('/user/event/:id',function (req,res) {
-	console.log(req.params.id);
-	console.log(req.body.event);
+	// console.log(req.params.id);
+	// console.log(req.body.event);
 
     Event.findById(req.params.id,function (err,event) {
        if (err){
@@ -346,5 +346,5 @@ app.delete('/user/event/:id', function (req,res) {
 
 // --- Listener ---
 app.listen(PORT, () => {
-    console.log(`Server listening at http://localhost:${PORT}`);
+    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
 });
