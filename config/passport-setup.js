@@ -14,25 +14,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// module.exports = (app) => {
-//     passport.use(new LocalStrategy(User.authenticate()));
-//     passport.serializeUser(User.serializeUser());
-//     passport.deserializeUser(User.deserializeUser());
-//     //use express session
-//     app.use(require('express-session')({
-//         secret: env.sessionSecret,
-//         resave: false,
-//         saveUninitialized: false
-//     }));
-//
-//     //init passport
-//     app.use(passport.initialize());
-//     //use session verify
-//     app.use(passport.session());
-//     // return passport;
-// };
-
-
 passport.use(new LocalStrategy(
     {
         usernameField: 'username',    // define the parameter in req.body that passport can use as username and password
@@ -50,17 +31,6 @@ passport.use(new LocalStrategy(
         });
     }
 ));
-
-// passport.serializeUser(function(user, done) {
-//     done(null, user._id);
-// });
-//
-// passport.deserializeUser(function(id, done) {
-//     User.findById(id, function(err, user) {
-//         done(err, user);
-//     });
-// });
-
 
 passport.use(
     new GoogleStrategy({
