@@ -7,10 +7,8 @@ const express   = require('express'),
     cookieParser = require("cookie-parser"),
     env = require('./config/env.json'),
     PORT     = env.SERVER_PORT,
-    // passport = require('passport'),
     passport = require('./config/passport-setup'),
     session = require("express-session"),
-    LocalStrategy = require("passport-local").Strategy,
     flash    = require("connect-flash"),
     deasync = require('deasync');
 
@@ -19,7 +17,6 @@ app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use(bodyParser.json({ extended: true, type: '*/*' }) );
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-
 
 // --- db connection ---
 mongoose.connect(`mongodb://${env.DB_HOST}/calendar`);
@@ -33,14 +30,7 @@ db.once('open', function() {
     console.log('mongodb connected successfully!');
 });
 
-
-// // --- passport init,setting password to work on application
-// passport.use(new LocalStrategy(User.authenticate()));
-// //reading session and take the code from session that's encode and uncode it
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
-
-// --- passport configuration ---
+// --- passport session configuration ---
 app.use(session({
     secret: env.sessionSecret,
     resave: false,
@@ -77,116 +67,20 @@ app.use((req,res, next) => {
 // --- service ---
 const {isLoggedIn,checkUserEvent} = require('./middleware.js');
 
-// ---      encryption funtion   ---
-// function cryptPwd(password) {
-//     const salt = 'abc';
-//     const saltPassword = password + ':' + salt;
-//     const md5 = crypto.createHash('md5');
-//     return md5.update(saltPassword).digest('hex');
-// }
-
-
 // --- Router ---
 // ---      Login         ---//
-app.post('/login', passport.authenticate('local'
-    // {
-    // failureFlash: 'Invalid username or password',
-    // successFlash: 'Welcome'}
-    ),(req, res) => {
+app.post('/login', passport.authenticate('local',
+    {
+        failureFlash: 'Invalid username or password',
+        successFlash: 'Welcome'
+    }),(req, res) => {
     console.log("auth success? "+ req.user.username);
     const userInfo = req.body;
     const username = userInfo.username;
     const pass = userInfo.password;
     console.log("username && password : " + username +" , "+ pass);
     res.status(200).send({userId: req.user._id, username: req.user.username, isLogin:true, msg: "Login success"});
-
-    // if (username === 'null' || pass === 'null') {
-    //     res.status(400).send({msg:'The input cannot be null', isLogin:false});
-    // }else {
-    //     User.findOne({
-    //         username:username,
-    //     }, function (err, user) {
-    //         console.log(user);
-    //         console.log('find user success :' + user._id);
-    //         console.log(`current user id ${user._id}, current user name ${user.username}`);
-    //         if(err) {
-    //             console.log(err);
-    //             res.status(200).send({msg:'Can not find the user', isLogin:false});
-    //         }else if (user){
-    //             console.log(`current user id ${user._id}, current user name ${user.username}`);
-    //             res.status(200).send({userId: user._id, username: user.username, isLogin:true, msg: "Login success"});
-    //         }
-    //     });
-    // }
 });
-// app.post('/login', (req, res ,next) => {
-//         const userInfo = req.body.userInfo;
-//         const username = userInfo.username;
-//         const pass = userInfo.password;
-//         console.log("username && password : " + username +" , "+ pass);
-//         if (username === 'null' || pass === 'null') {
-//             res.status(400).send({msg:'The input cannot be null', isLogin:false});
-//         }else {
-//             passport.authenticate('local', (err, user, info) => {
-//                 if (err) {
-//                     console.log(err);
-//                     res.status(400).send({msg: 'The user authenticate failed', isLogin: false});
-//                 }
-//                 console.log('find user success :' + user._id);
-//                 if (!user) {
-//                     console.log(err);
-//                     res.status(400).send({msg: 'The user is not existed', isLogin: false});
-//                 }
-//                 return req.logIn(user, function (err) {
-//                     if (err) {
-//                         console.log(err);
-//                         res.status(200).send({msg: 'Can not find the user', isLogin: false});
-//                     } else {
-//                         console.log("login user : " + user._id + " , " + user.username);
-//                         res.status(200).send({
-//                             userId: user._id,
-//                             username: user.username,
-//                             isLogin: true,
-//                             msg: "Login success"
-//                         });
-//                     }
-//                 });
-//             })(req, res, next);
-//         }
-//     });
-// app.post('/login', (req, res ) =>  {
-//     const userInfo = req.body.userInfo;
-//     const user = userInfo.username;
-//     const pass = userInfo.password;
-//     //console.log(user + pass);
-//     if (user === 'null' || pass === 'null') {
-//         res.status(200).send({msg:'The input cannot be null', isLogin:false});
-//     }else{
-//
-//         //add salt
-//         const currPass = cryptPwd(req.params.password);
-//         const currUser =  {
-//             username: user.toLowerCase(),
-//             password: currPass
-//         };
-//         // console.log(currUser);
-//         User.findOne({
-//             username:currUser.username,
-//             password:currUser.password
-//         }, function (err, data) {
-//             // console.log(data);
-//             if(err) {
-//                 console.log(err);
-//             }else if (data){
-//                 console.log("login user : "+ data._id +" , " +data.username);
-//                 res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});
-//             }else{
-//                 res.status(200).send({msg:'Can not find the user', isLogin:false});
-//             }
-//         });
-//     }
-//
-// });
 
 // ---      register         ---//
 
@@ -209,14 +103,13 @@ app.post('/register', (req, res) =>  {
                     res.status(400).send({msg: 'user-register-failed',user:user});
                 }
                 passport.authenticate('local',function (err,user,info) {
-                    console.log(arguments);
+                    // console.log(arguments);
                 })(req, res, function () {
-                    console.log('into authenticate....');
-                    res.status(200).send(JSON.stringify((info)));
-                    // req.flash('success','Successfully signed up! Nice to meet you'+username);
+                    // res.status(200).send(JSON.stringify((info)));
+                    req.flash('success','Successfully signed up! Nice to meet you'+username);
                 });
             });
-            console.log("create user...");
+            console.log("create user success ...");
             res.status(200).send({msg: 'Register Success', isRegister: true});
         }else{
             res.status(400).send({msg:'The passwords are not equal',isRegister:false});
