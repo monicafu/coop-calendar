@@ -8,9 +8,7 @@ export const userLogin = async (path, userInfo) => {
     try {
         const res = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify({
-                userInfo,
-            }),
+            body: JSON.stringify(userInfo),
         });
 
         return await res.json();
@@ -26,9 +24,7 @@ export const userSignup = async (path, userInfo) => {
     try {
         const res = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify({
-                userInfo,
-            }),
+            body: JSON.stringify(userInfo),
         });
 
         return await res.json();
