@@ -4,22 +4,25 @@ const express   = require('express'),
     path      = require('path'),
     app       = express(),
     mongoose = require('mongoose'),
-    cookieSession = require('cookie-session'),
-    env = require('./env.json'),
+    cookieParser = require("cookie-parser"),
+    env = require('./config/env.json'),
     PORT     = env.SERVER_PORT,
-    passport = require('passport'),
-    crypto = require('crypto'),
-    LocalStrategy = require("passport-local"),
+    // passport = require('passport'),
+    passport = require('./config/passport-setup'),
+    session = require("express-session"),
+    LocalStrategy = require("passport-local").Strategy,
     flash    = require("connect-flash"),
     deasync = require('deasync');
 
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
-app.use( bodyParser.json({ extended: true, type: '*/*' }) );
-//const jsonParser = bodyParser.json({extended: true, type: '*/*'});
+app.use(bodyParser.json({ extended: true, type: '*/*' }) );
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
+
 
 // --- db connection ---
-mongoose.connect('mongodb://${env.DB_HOST}/calendar');
+mongoose.connect(`mongodb://${env.DB_HOST}/calendar`);
 const User = require('./models/user');
 const Event = require('./models/event');
 
@@ -30,21 +33,35 @@ db.once('open', function() {
     console.log('mongodb connected successfully!');
 });
 
+
+// // --- passport init,setting password to work on application
+// passport.use(new LocalStrategy(User.authenticate()));
+// //reading session and take the code from session that's encode and uncode it
+// passport.serializeUser(User.serializeUser());
+// passport.deserializeUser(User.deserializeUser());
+
 // --- passport configuration ---
-app.use(flash());
-//passport init,setting password to work on application
+app.use(session({
+    secret: env.sessionSecret,
+    resave: false,
+    saveUninitialized: false
+}));
+// --- passport enable
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
-//reading session and take the code from session that's encode and uncode it
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
+// --- use flash
+app.use(flash());
 app.use(function(req, res, next){
     res.locals.currentUser = req.user;
-    //res.locals.success = req.flash('success');
-    //res.locals.error = req.flash('error');
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
     next();
+});
+
+// --- Listener ---
+app.listen(PORT, () => {
+    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
 });
 
 
@@ -61,89 +78,148 @@ app.use((req,res, next) => {
 const {isLoggedIn,checkUserEvent} = require('./middleware.js');
 
 // ---      encryption funtion   ---
-function cryptPwd(password) {
-    const salt = 'abc';
-    const saltPassword = password + ':' + salt;
-    const md5 = crypto.createHash('md5');
-    return md5.update(saltPassword).digest('hex');
-}
+// function cryptPwd(password) {
+//     const salt = 'abc';
+//     const saltPassword = password + ':' + salt;
+//     const md5 = crypto.createHash('md5');
+//     return md5.update(saltPassword).digest('hex');
+// }
 
 
 // --- Router ---
 // ---      Login         ---//
-app.post('/login', (req, res ) =>  {
-    const userInfo = req.body.userInfo;
-    const user = req.userInfo.username;
-    const pass = req.userInfo.password;
-    //console.log(user + pass);
-    if (user === 'null' || pass === 'null') {
-        res.status(200).send({msg:'The input cannot be null', isLogin:false});
-    }else{
+app.post('/login', passport.authenticate('local'
+    // {
+    // failureFlash: 'Invalid username or password',
+    // successFlash: 'Welcome'}
+    ),(req, res) => {
+    console.log("auth success? "+ req.user.username);
+    const userInfo = req.body;
+    const username = userInfo.username;
+    const pass = userInfo.password;
+    console.log("username && password : " + username +" , "+ pass);
+    res.status(200).send({userId: req.user._id, username: req.user.username, isLogin:true, msg: "Login success"});
 
-        //add salt
-        const currPass = cryptPwd(req.params.password);
-        const currUser =  {
-            username: user.toLowerCase(),
-            password: currPass
-        };
-        // console.log(currUser);
-        User.findOne({
-            username:currUser.username,
-            password:currUser.password
-        }, function (err, data) {
-            console.log(data);
-            if(err) {
-                console.log(err);
-            }else if (data){
-                console.log(data._id +" , " +data.username);
-                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});
-            }else{
-                res.status(200).send({msg:'Can not find the user', isLogin:false});
-            }
-        });
-    }
-
+    // if (username === 'null' || pass === 'null') {
+    //     res.status(400).send({msg:'The input cannot be null', isLogin:false});
+    // }else {
+    //     User.findOne({
+    //         username:username,
+    //     }, function (err, user) {
+    //         console.log(user);
+    //         console.log('find user success :' + user._id);
+    //         console.log(`current user id ${user._id}, current user name ${user.username}`);
+    //         if(err) {
+    //             console.log(err);
+    //             res.status(200).send({msg:'Can not find the user', isLogin:false});
+    //         }else if (user){
+    //             console.log(`current user id ${user._id}, current user name ${user.username}`);
+    //             res.status(200).send({userId: user._id, username: user.username, isLogin:true, msg: "Login success"});
+    //         }
+    //     });
+    // }
 });
+// app.post('/login', (req, res ,next) => {
+//         const userInfo = req.body.userInfo;
+//         const username = userInfo.username;
+//         const pass = userInfo.password;
+//         console.log("username && password : " + username +" , "+ pass);
+//         if (username === 'null' || pass === 'null') {
+//             res.status(400).send({msg:'The input cannot be null', isLogin:false});
+//         }else {
+//             passport.authenticate('local', (err, user, info) => {
+//                 if (err) {
+//                     console.log(err);
+//                     res.status(400).send({msg: 'The user authenticate failed', isLogin: false});
+//                 }
+//                 console.log('find user success :' + user._id);
+//                 if (!user) {
+//                     console.log(err);
+//                     res.status(400).send({msg: 'The user is not existed', isLogin: false});
+//                 }
+//                 return req.logIn(user, function (err) {
+//                     if (err) {
+//                         console.log(err);
+//                         res.status(200).send({msg: 'Can not find the user', isLogin: false});
+//                     } else {
+//                         console.log("login user : " + user._id + " , " + user.username);
+//                         res.status(200).send({
+//                             userId: user._id,
+//                             username: user.username,
+//                             isLogin: true,
+//                             msg: "Login success"
+//                         });
+//                     }
+//                 });
+//             })(req, res, next);
+//         }
+//     });
+// app.post('/login', (req, res ) =>  {
+//     const userInfo = req.body.userInfo;
+//     const user = userInfo.username;
+//     const pass = userInfo.password;
+//     //console.log(user + pass);
+//     if (user === 'null' || pass === 'null') {
+//         res.status(200).send({msg:'The input cannot be null', isLogin:false});
+//     }else{
+//
+//         //add salt
+//         const currPass = cryptPwd(req.params.password);
+//         const currUser =  {
+//             username: user.toLowerCase(),
+//             password: currPass
+//         };
+//         // console.log(currUser);
+//         User.findOne({
+//             username:currUser.username,
+//             password:currUser.password
+//         }, function (err, data) {
+//             // console.log(data);
+//             if(err) {
+//                 console.log(err);
+//             }else if (data){
+//                 console.log("login user : "+ data._id +" , " +data.username);
+//                 res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});
+//             }else{
+//                 res.status(200).send({msg:'Can not find the user', isLogin:false});
+//             }
+//         });
+//     }
+//
+// });
 
 // ---      register         ---//
 
 
-app.post('/register', (req, res ) =>  {
-    console.log(req.body);
-    const userInfo = req.body.userInfo;
-    const user = req.body.username.toLowerCase();
+app.post('/register', (req, res) =>  {
+    const userInfo = req.body;
+    const username = userInfo.username;
     const pass1 = userInfo.password;
     const pass2 = userInfo.vpassword;
-    //console.log(user + pass1 + pass2);
-    if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
-        res.status(200).send({msg:'The input is not valid', isRegister:false});
+    console.log("username && password : " + username +" , "+ pass1 +" , "+pass2);
+    if (username === 'null' || pass1 === 'null' || pass2 === 'null') {
+        res.status(400).send({msg:'The input is not valid', isRegister:false});
     }else{
         if (pass1 === pass2) {
-            const currPass = cryptPwd(req.params.password);
-            const currUser =  {
-                username: user,
-                password: currPass
-            };
-            User.findOne({
-                username:currUser.username
-            }, function (err, data) {
-                if(err) {
+            const newUser = new User({username : username});
+            User.register(newUser,pass1,function (err,user) {
+                if (err){
                     console.log(err);
+                    req.flash("error", err.message);
+                    res.status(400).send({msg: 'user-register-failed',user:user});
                 }
-                // if the user has existed
-                if (data) {
-                    res.status(200).send({msg:'The username has existed',isRegister:false});
-                }else{
-                    console.log("create user...");
-                    User.create(currUser, (err) => {
-                        if(err) return console.log(err);
-                        res.status(200).send({msg:'Register Success', isRegister:true});
-                    })
-                }
+                passport.authenticate('local',function (err,user,info) {
+                    console.log(arguments);
+                })(req, res, function () {
+                    console.log('into authenticate....');
+                    res.status(200).send(JSON.stringify((info)));
+                    // req.flash('success','Successfully signed up! Nice to meet you'+username);
+                });
             });
-        }
-        else{
-            res.status(200).send({msg:'The passwords are not equal',isRegister:false});
+            console.log("create user...");
+            res.status(200).send({msg: 'Register Success', isRegister: true});
+        }else{
+            res.status(400).send({msg:'The passwords are not equal',isRegister:false});
         }
     }
 
@@ -154,6 +230,7 @@ app.post('/register', (req, res ) =>  {
 
 app.get('/logout',(req, res) => {
     req.logout();
+    // req.flash("success", "LOGGED YOU OUT!");
 });
 
 
@@ -177,7 +254,7 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',isLoggedIn,function (req,res){
+app.get('/user/:id/:year/:month',isLoggedIn, (req,res) => {
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
@@ -218,7 +295,7 @@ app.get('/user/:id/:year/:month',isLoggedIn,function (req,res){
 
 
 /* a logged user create event*/
-app.post('/user/event',isLoggedIn,function (req,res) {
+app.post('/user/event',isLoggedIn, (req,res) => {
     console.log('get userId  '+ req.body.id);
     User.findById(req.body.id,function (err,user) {
         if (err){
@@ -252,7 +329,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 
 /* a logged user edit event*/
-app.put('/user/event/:id',checkUserEvent,function (req,res) {
+app.put('/user/event/:id',checkUserEvent,(req,res) => {
     Event.findById(req.params.id,function (err,event) {
        if (err){
            console.log(err);
@@ -290,7 +367,7 @@ app.put('/user/event/:id',checkUserEvent,function (req,res) {
 
 
 /* a logged user delete event*/
-app.delete('/user/event/:id',checkUserEvent, function (req,res) {
+app.delete('/user/event/:id',checkUserEvent,(req,res) => {
     Event.findById(req.params.id,function (err,event) {
         if (err){
             console.log(err);
@@ -331,9 +408,3 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
 });
 
 
-
-
-// --- Listener ---
-app.listen(PORT, () => {
-    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
-});
