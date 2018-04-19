@@ -4,13 +4,14 @@ const express   = require('express'),
     path      = require('path'),
     app       = express(),
     mongoose = require('mongoose'),
-    //cookieSession = require('cookie-session'),
-    keys = require('./config/keys'),
-    PORT     = process.env.PORT || 5000,
+    cookieSession = require('cookie-session'),
+    env = require('./env.json'),
+    PORT     = env.SERVER_PORT,
     passport = require('passport'),
     crypto = require('crypto'),
     LocalStrategy = require("passport-local"),
-    flash    = require("connect-flash");
+    flash    = require("connect-flash"),
+    deasync = require('deasync');
 
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
@@ -18,7 +19,7 @@ app.use( bodyParser.json({ extended: true, type: '*/*' }) );
 //const jsonParser = bodyParser.json({extended: true, type: '*/*'});
 
 // --- db connection ---
-mongoose.connect('mongodb://localhost/calendar');
+mongoose.connect('mongodb://${env.DB_HOST}/calendar');
 const User = require('./models/user');
 const Event = require('./models/event');
 
@@ -71,8 +72,9 @@ function cryptPwd(password) {
 // --- Router ---
 // ---      Login         ---//
 app.post('/login', (req, res ) =>  {
-    const user = req.body.username;
-    const pass = req.body.password;
+    const userInfo = req.body.userInfo;
+    const user = req.userInfo.username;
+    const pass = req.userInfo.password;
     //console.log(user + pass);
     if (user === 'null' || pass === 'null') {
         res.status(200).send({msg:'The input cannot be null', isLogin:false});
@@ -84,7 +86,7 @@ app.post('/login', (req, res ) =>  {
             username: user.toLowerCase(),
             password: currPass
         };
-        console.log(currUser);
+        // console.log(currUser);
         User.findOne({
             username:currUser.username,
             password:currUser.password
@@ -93,7 +95,7 @@ app.post('/login', (req, res ) =>  {
             if(err) {
                 console.log(err);
             }else if (data){
-                console.log(data._id + data.username);
+                console.log(data._id +" , " +data.username);
                 res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});
             }else{
                 res.status(200).send({msg:'Can not find the user', isLogin:false});
@@ -108,9 +110,10 @@ app.post('/login', (req, res ) =>  {
 
 app.post('/register', (req, res ) =>  {
     console.log(req.body);
+    const userInfo = req.body.userInfo;
     const user = req.body.username.toLowerCase();
-    const pass1 = req.body.password;
-    const pass2 = req.body.vpassword;
+    const pass1 = userInfo.password;
+    const pass2 = userInfo.vpassword;
     //console.log(user + pass1 + pass2);
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
         res.status(200).send({msg:'The input is not valid', isRegister:false});
@@ -175,30 +178,38 @@ app.get('/auth/google/redirect',
 
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',isLoggedIn,function (req,res){
-    const year = req.params.year;
-    const month = req.params.month;
-    let events = {};
+    const year = parseInt(req.params.year);
+    const month = parseInt(req.params.month);
+    let sendEvents = [];
     User.findById(req.params.id,function (err, user) {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-user-failed'});
         }else{
+            let count =0, length = user.events.length;
             for (let eventId of user.events){
-                Event.findById(eventId,function (err,event) {
-                    if (event !== null){
-                        console.log('event Id: '+ eventId);
-                        console.log('event object: '+event);
-                        console.log('event year： '+ event.startDate.getFullYear() +" event month: "+event.startDate.getMonth());
-                        if (event.startDate.getFullYear() === year && event.startDate.getMonth() - 1 === month){
-                            events[event._id] = event;
-                            console.log(events);
-                        }
-                    }
+                 Event.findById(eventId, (err,event) => {
+                     if (err){
+                         console.log(err);
+                         res.status(400).send({'msg':'find-event-failed'});
+                     }else{
+                         let obj = {};
+                         if (event !== null){
+                             if ((year >= parseInt(event.startDate.getFullYear())  &&  year <= parseInt(event.endDate.getFullYear()))
+                                 && (month >= parseInt(event.startDate.getMonth()) && month <= parseInt(event.startDate.getMonth()))){
+                                 Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
+                                 sendEvents.push(event);
+                             }
+                         }
+                     }
+                     count++;
                 });
             }
+            deasync.loopWhile(() => count < length);
+
             res.status(200).send(
                 JSON.stringify({
-                    events
+                    sendEvents
                 })
             );
         }
@@ -208,6 +219,7 @@ app.get('/user/:id/:year/:month',isLoggedIn,function (req,res){
 
 /* a logged user create event*/
 app.post('/user/event',isLoggedIn,function (req,res) {
+    console.log('get userId  '+ req.body.id);
     User.findById(req.body.id,function (err,user) {
         if (err){
             console.log(err);
@@ -229,6 +241,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
                     console.log('success,Created a new event!');
                     //req.flash('success','Created a new event!');
                     res.status(200).send({
+                        eventId: event._id,
                         isCreated :true
                     });
                 }
@@ -239,13 +252,13 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 
 /* a logged user edit event*/
-app.put('/user/event/:id',isLoggedIn,function (req,res) {
+app.put('/user/event/:id',checkUserEvent,function (req,res) {
     Event.findById(req.params.id,function (err,event) {
        if (err){
            console.log(err);
            res.status(400).send({'msg':'find-event-failed'});
        }else{
-           if (event.creator.username === currentUser.name || event.visibility === 'private'){
+           if (event.visibility === 'private'){
                Event.findByIdAndUpdate(req.params.id,req.body.event,function (err, event) {
                    if (err){
                        console.log(err);
@@ -277,13 +290,24 @@ app.put('/user/event/:id',isLoggedIn,function (req,res) {
 
 
 /* a logged user delete event*/
-app.delete('/user/event/:id',isLoggedIn, function (req,res) {
+app.delete('/user/event/:id',checkUserEvent, function (req,res) {
     Event.findById(req.params.id,function (err,event) {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-event-failed'});
         }else{
-            if (event.creator.username === currentUser.name || event.visibility === 'private'){
+            if (event.visibility === 'private'){
+                User.findById(event.creator.id,function (err,user) {
+                    if (err){
+                        console.log(err);
+                    }else{
+                        for (let eventId of user.events){
+                            const index = user.events.indexOf(eventId);
+                            user.events.splice(index,1);
+                            user.save();
+                        }
+                    }
+                });
                 Event.findByIdAndRemove(req.params.id,function (err) {
                     if (err){
                         console.log(err);
@@ -311,5 +335,5 @@ app.delete('/user/event/:id',isLoggedIn, function (req,res) {
 
 // --- Listener ---
 app.listen(PORT, () => {
-    console.log(`Server listening at http://localhost:${PORT}`);
+    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
 });
