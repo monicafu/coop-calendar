@@ -11,9 +11,19 @@ const User = require('../models/user');//require model
 // --- passport init,setting password to work on application
 passport.use(new LocalStrategy(User.authenticate()));
 //reading session and take the code from session that's encode and uncode it
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// passport.serializeUser(User.serializeUser());
+// passport.deserializeUser(User.deserializeUser());
 
+
+passport.serializeUser(function(user, done){
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done){
+    User.findById(id, function(err, user){
+        done(err, user);
+    });
+});
 passport.use(new LocalStrategy(
     {
         usernameField: 'username',    // define the parameter in req.body that passport can use as username and password
@@ -34,7 +44,7 @@ passport.use(new LocalStrategy(
 
 passport.use(
     new GoogleStrategy({
-            callbackURL: 'http://localhost:8000/auth/google/redirect',
+            callbackURL: env.google.URL,
             clientID: env.google.clientID,
             clientSecret: env.google.clientSecret
         }, function(accessToken, refreshToken, profile, done) {
@@ -54,7 +64,6 @@ passport.use(
             });
         }
     ));
-
 
 
 
