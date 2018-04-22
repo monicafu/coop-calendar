@@ -86,7 +86,7 @@ function cryptPwd(password) {
 // ---      Login         ---//
 app.post('/login', (req, res ) =>  {
 	const userInfo = req.body
-    console.log(userInfo);
+    console.log(userInfo.username);
     const user = userInfo.username;
     const pass = userInfo.password;
 
@@ -104,16 +104,18 @@ app.post('/login', (req, res ) =>  {
             username:currUser.username,
             password:currUser.password
         }, function (err, data) {
-                if(err){
-                    console.log(err);   
-                    res.status(400).send({isLogin:false, msg: "username or password is not correct"});           
-                }
-                req.session.loginUser = {
-                    username: data.username,
-                    id: data._id
-                };
-                //console.log(req.session);
-                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});                         
+            if(err){
+                console.log(err);   
+                res.status(400).send({isLogin:false, msg: "username or password is not correct"});           
+            }else{
+                if (data) {
+                   req.session.loginUser = {
+                        username: data.username,
+                        id: data._id
+                    };
+                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});      
+                }   
+            }                        
         });
     }
 });
