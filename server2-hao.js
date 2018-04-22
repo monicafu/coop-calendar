@@ -11,7 +11,6 @@ const express   = require('express'),
     crypto = require('crypto'),
     session = require('express-session'),
     LocalStrategy = require("passport-local"),
-    flash    = require("connect-flash"),
     deasync = require('deasync'),
     MongoStore = require('connect-mongo')(session);
     //RedisStore = require('connect-redis')(session);
@@ -34,7 +33,7 @@ db.once('open', function() {
 });
 
 // --- passport configuration ---
-app.use(flash());
+// app.use(flash());
 //passport init,setting password to work on application
 app.use(passport.initialize());
 app.use(passport.session());
@@ -270,7 +269,6 @@ app.post('/user/event',isLoggedIn,function (req,res) {
                         user.events.push(event);
                         user.save();
                         console.log('success,Created a new event!');
-                        req.flash('success','Created a new event!');
                         res.status(200).send({
                             eventId: event._id,
                             isCreated :true
@@ -305,7 +303,6 @@ app.put('/user/event/:id',checkUserEvent,function (req,res) {
                            //save event to db
                            event.save();
                            console.log('Update event successfully!');
-                           req.flash('success','Update event successfully!');
                            res.status(200).send({
                                isUpdated :true
                            });
@@ -313,7 +310,6 @@ app.put('/user/event/:id',checkUserEvent,function (req,res) {
                    });
                }else{
                    console.log("error,user don't have permission to do that!");
-                   req.flash("error", "You don't have permission to do that!");
                    res.status(200).send({
                        isUpdated :false
                    });
@@ -351,7 +347,6 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
                         res.status(400).send({isDeleted :false,'msg':'delete-event-failed'});
                     }else{
                         console.log('delete a event successfully!');
-                        req.flash('success','delete event successfully!');
                         res.status(200).send({
                             isDeleted :true
                         });
@@ -359,7 +354,6 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
                 });
             }else{
                 console.log("error,user don't have permission to do that!");
-                req.flash("error", "You don't have permission to do that!");
                 res.status(200).send({
                     isDeleted :false
                 });

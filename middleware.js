@@ -19,7 +19,7 @@ module.exports  = {
                if (event.creator.id.equals(req.session.loginUser.id)){
                    next();
                }else{
-                   req.flash("error", "You don't have permission to do that!");
+                   console.log("error", "You don't have permission to do that!");
                    res.status(400).send(
                        JSON.stringify({'msg':'find-user-event-failed'})
                    );
