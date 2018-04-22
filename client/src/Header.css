@@ -40,6 +40,32 @@ header .panel {
 	align-items: center;
 }
 
+.paging .dropdown {
+	display: inline-block;
+	position: relative;
+	font-size: 0;
+}
+
+.paging .tip {
+	position: absolute;
+	padding: 3px 5px;
+	top: 100%;
+	left: 0;
+	border-radius: 3px;
+	color: #f1f1f1;
+	background-color: rgba(0, 0, 0, 0.6);
+	text-align: left;
+	overflow: hidden;
+	font-size: 12px;
+	transition: .1s .3s;
+	transform: scale(0);
+	transform-origin: center;
+}
+
+.paging .dropdown:hover .tip {
+	transform: scale(1);
+}
+
 .paging svg {
 	cursor: pointer;
 	transition: .2s;
@@ -131,19 +157,19 @@ header .panel {
 	position: relative;
 }
 
-.dropdown {
+.login .dropdown {
 	display: inline-block;
 	position: relative;
 }
 
-.username {
+.login .username {
 	position: relative;
 	color: #202020;
 	font-size: 12px;
 	font-weight: bold;
 }
 
-.username::before {
+.login .username::before {
 	content: '';
 	position: absolute;
 	width: 8px;
@@ -157,7 +183,7 @@ header .panel {
 	transition: 0.1s 0.2s;
 }
 
-.username::after {
+.login .username::after {
 	content: '';
 	display: inline-block;
 	width: 8px;
@@ -172,14 +198,14 @@ header .panel {
 	transition: 0.1s 0.2s;
 }
 
-.dropdown:hover .username::before {
+.login .dropdown:hover .username::before {
 	transform: rotate(45deg) translate(-3px, 3px);
 }
-.dropdown:hover .username::after {
+.login .dropdown:hover .username::after {
 	transform: rotate(-45deg);
 }
 
-.login-content {
+.login .login-content {
 	padding: 6px 15px 8px;
 	position: absolute;
 	top: 100%;
@@ -221,7 +247,7 @@ header .panel {
 	transform: scaleX(1);
 }
 
-.dropdown:hover .login-content {
+.login .dropdown:hover .login-content {
 	transform: scaleY(1);
 }
 
