@@ -48,6 +48,7 @@ passport.use(
             clientID: env.google.clientID,
             clientSecret: env.google.clientSecret
         }, function(accessToken, refreshToken, profile, done) {
+            console.log('google middleware');
             User.findOne({password: profile.id}).then(currentUser =>{
                 if (currentUser) {
                     console.log('the user has already existed' + currentUser.userId + currentUser.username);
