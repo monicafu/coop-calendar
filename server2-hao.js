@@ -7,7 +7,7 @@ const express   = require('express'),
     cookieParser = require('cookie-parser'),
     env = require('./config/env.json'),
     PORT     = env.SERVER_PORT,
-    passport = require('passport'),
+    passport = require('./config/passport-setup'),
     crypto = require('crypto'),
     session = require('express-session'),
     LocalStrategy = require("passport-local"),
@@ -52,7 +52,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use(session({
     name: 'mysession',
     secret: 'password',  // 用来对session id相关的cookie进行签名
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),// 本地存储session（文本文件，也可以选择其他store，比如redis的）
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
     saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
     resave: false,  // 是否每次都重新保存会话，建议false
     cookie: {
@@ -179,16 +179,17 @@ app.post('/register', (req, res ) =>  {
 // --- LogOut --- //
 
 app.get('/logout',(req, res) => {
-    console.log(req.session);
-    req.session.destroy(function(err) {
-        if(err){
-            res.status(400).send({msg:'Login out failed',isLogin:true});
-            return;
-        }
-        req.session.loginUser = null;
-        res.clearCookie('mysession');
-        res.status(200).send({isLoginOut:true, msg: "Login out" });  
-    });
+    //console.log(req.session);
+    //console.log(req.cookies);
+    req.session.loginUser = null;
+    res.clearCookie('user');
+    console.log('delete cookie');
+    if (req.session.loginUser) {
+        res.status(400).send({msg:'Login out failed',isLogin:true});
+    }else{
+        console.log('success');
+        res.status(200).send({isLoginOut:true, msg: "Login out Successfully" });  
+    }
 });
 
 
@@ -205,9 +206,12 @@ app.get('/auth/google', passport.authenticate('google',{
 app.get('/auth/google/redirect',
     passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
-        // console.log(req.user);
-        res.send(req.user);
-        //res.redirect('http://localhost:3000');
+        console.log(req.user);
+        res.cookie('user', JSON.stringify({
+                        username: req.user.username,
+                        id: req.user._id,
+        }));
+        res.redirect('http://localhost:3000');
     });
 
 
