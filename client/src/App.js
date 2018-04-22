@@ -10,7 +10,7 @@ import Login from './Login';
 
 // Functions
 import cal from './script/dateCalculator.js';
-import { getUserEvents } from './script/fetchService.js';
+import { getUserEvents, userLogout } from './script/fetchService.js';
 import cookie from 'react-cookies';
 
 class App extends Component {
@@ -50,14 +50,22 @@ class App extends Component {
 	}
 
 	logout() {
-		this.setState({
-			currentDate: cal.today(),
-			currentUser: {},
-			events: [],
-			searchContent: '',
-			isLoginOpen: false,
-			isPopupAddOpen: false,
-		});
+		userLogout('logout')
+		.then( result => {
+			if (!result.isLogin) {
+				this.setState({
+					currentDate: cal.today(),
+					currentUser: {},
+					events: [],
+					searchContent: '',
+					isLoginOpen: false,
+					isPopupAddOpen: false,
+				});
+			}
+		})
+		.catch( error => {
+			console.log(error);
+		})
 	}
 
 	getEvents() {
