@@ -40,7 +40,8 @@
     "react-cookies": "^0.1.0",
     "redis": "^2.8.0",
     "session-file-store": "^1.2.0",
-    "universal-cookie-express": "^2.1.2"
+    "universal-cookie-express": "^2.1.2",
+    "xss-filters": "^1.2.7"
   },
   "devDependencies": {
     "concurrently": "^3.5.1"

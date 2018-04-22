@@ -12,9 +12,8 @@ const express   = require('express'),
     session = require('express-session'),
     LocalStrategy = require("passport-local"),
     deasync = require('deasync'),
-    MongoStore = require('connect-mongo')(session);
-    //RedisStore = require('connect-redis')(session);
-    // cookiesMiddleware = require('universal-cookie-express');
+    MongoStore = require('connect-mongo')(session),
+    xssFilters = require('xss-filters');
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use( bodyParser.json({ extended: true, type: '*/*' }) );
@@ -51,12 +50,12 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(session({
     name: 'mysession',
-    secret: 'password',  // 用来对session id相关的cookie进行签名
+    secret: env.sessionSecret,  
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
-    resave: false,  // 是否每次都重新保存会话，建议false
+    saveUninitialized: false,  
+    resave: false,  
     cookie: {
-        maxAge: 3600 * 1000,  // 有效期，单位是毫秒
+        maxAge: 3600 * 1000,  // 1h,ms
         secure:false,  
     }
 }));
@@ -93,6 +92,10 @@ app.post('/login', (req, res ) =>  {
     console.log(userInfo.username);
     const user = userInfo.username;
     const pass = userInfo.password;
+    //add xss attack filter
+    const untrustedname = req.query.username;
+    console.log(untrustedname);
+    res.send('<h1> Hello, ' + xssFilters.inHTMLData(untrustedname) + '!</h1>');
 
     if (user === 'null' || pass === 'null') {
         res.status(400).send({msg:'The input cannot be null', isLogin:false});
@@ -140,7 +143,11 @@ app.post('/register', (req, res ) =>  {
     const user = userInfo.username.toLowerCase();
     const pass1 = userInfo.password;
     const pass2 = userInfo.vpassword;
-
+    //add xss attack filter
+    const untrustedname = req.query.username;
+    console.log(untrustedname);
+    res.send('<h1> Hello, ' + xssFilters.inHTMLData(untrustedname) + '!</h1>');
+    
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
         res.status(400).send({msg:'The input is not valid', isRegister:false});
     }else{
@@ -222,8 +229,8 @@ app.get('/auth/google/redirect',
 
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
-    console.log(req.cookies);
-    console.log('line:217 req session' + req.sessionID);
+    // console.log(req.cookies);
+    // console.log('line:217 req session' + req.sessionID);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
