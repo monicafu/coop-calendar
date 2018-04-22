@@ -36,6 +36,22 @@ export const userSignup = async (path, userInfo) => {
     }
 }
 
+export const userLogout = async (path) => {
+    const url = baseUrl + path;
+
+    try {
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        return await res.json();
+    }
+    catch(e) {
+        return Promise.reject('logout-fail (' + e + ')');
+    }
+}
+
 
 // Data fetch services
 
