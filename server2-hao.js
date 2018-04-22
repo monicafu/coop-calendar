@@ -4,17 +4,21 @@ const express   = require('express'),
     path      = require('path'),
     app       = express(),
     mongoose = require('mongoose'),
-    //cookieSession = require('cookie-session'),
+    cookieParser = require('cookie-parser'),
     env = require('./config/env.json'),
     PORT     = env.SERVER_PORT,
     passport = require('passport'),
     crypto = require('crypto'),
+    session = require('express-session'),
     LocalStrategy = require("passport-local"),
     flash    = require("connect-flash"),
-    deasync = require('deasync');
+    deasync = require('deasync'),
+    MongoStore = require('connect-mongo')(session);
+    //RedisStore = require('connect-redis')(session);
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use( bodyParser.json({ extended: true, type: '*/*' }) );
+app.use(cookieParser());
 //const jsonParser = bodyParser.json({extended: true, type: '*/*'});
 
 // --- db connection ---
@@ -39,19 +43,27 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(function(req, res, next){
-    res.locals.currentUser = req.user;
-    //res.locals.success = req.flash('success');
-    //res.locals.error = req.flash('error');
-    next();
-});
+//session
+
+app.use(session({
+    name: 'mysession',
+    secret: 'password',  // 用来对session id相关的cookie进行签名
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),// 本地存储session（文本文件，也可以选择其他store，比如redis的）
+    saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
+    resave: false,  // 是否每次都重新保存会话，建议false
+    cookie: {
+        maxAge: 3600 * 1000,  // 有效期，单位是毫秒
+        secure:false,  
+    }
+}));
 
 
 // --- CORS set ---
 app.use((req,res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Methods', 'OPTION,GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept');
+    res.setHeader('Access-Control-Allow-Credentials',true);
     next();
 });
 
@@ -67,8 +79,6 @@ function cryptPwd(password) {
     return md5.update(saltPassword).digest('hex');
 }
 
-//define current user
-let currentUser = {};
 
 
 
@@ -84,7 +94,7 @@ app.post('/login', (req, res ) =>  {
         res.status(200).send({msg:'The input cannot be null', isLogin:false});
     }else{
         //add salt
-        const currPass = cryptPwd(req.params.password);
+        const currPass = cryptPwd(pass);
         const currUser =  {
             username: user.toLowerCase(),
             password: currPass
@@ -94,22 +104,17 @@ app.post('/login', (req, res ) =>  {
             username:currUser.username,
             password:currUser.password
         }, function (err, data) {
-            //console.log(data);
-            //added current user to local variable
-            currentUser.id = data._id;
-            currentUser.name = data.username;
-            console.log(`current user id ${currentUser.id}, current user name ${currentUser.name}`);
-            if(err) {
-                console.log(err);
-            }else if (data){
-                //console.log(data._id + data.username);
-                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});
-            }else{
-                res.status(200).send({msg:'Can not find the user', isLogin:false});
-            }
+                if(err){
+                    console.log(err);              
+                }
+                req.session.loginUser = {
+                    username: data.username,
+                    id: data._id
+                };
+                //console.log(req.session);
+                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});                         
         });
     }
-
 });
 
 // ---      register         ---//
@@ -126,7 +131,7 @@ app.post('/register', (req, res ) =>  {
         res.status(200).send({msg:'The input is not valid', isRegister:false});
     }else{
         if (pass1 === pass2) {
-            const currPass = cryptPwd(req.params.password);
+            const currPass = cryptPwd(pass1);
             const currUser =  {
                 username: user,
                 password: currPass
@@ -137,7 +142,6 @@ app.post('/register', (req, res ) =>  {
                 if(err) {
                     console.log(err);
                 }
-
                 // if the user has existed
                 if (data) {
                     res.status(200).send({msg:'The username has existed',isRegister:false});
@@ -187,7 +191,8 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',(req, res) => {
+app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
+    console.log(req.session.loginUser);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
@@ -228,8 +233,8 @@ app.get('/user/:id/:year/:month',(req, res) => {
 });
 
 /* a logged user create event*/
-app.post('/user/event',function (req,res) {
-    User.findById(currentUser.id,function (err,user) {
+app.post('/user/event',isLoggedIn,function (req,res) {
+    User.findById(req.session.loginUser.id,function (err,user) {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-user-id-failed'});
@@ -240,8 +245,8 @@ app.post('/user/event',function (req,res) {
                     res.status(400).send({'msg':'create-event-failed'});
                 }else{
                     //create event and add user
-                    event.creator.id = currentUser.id;
-                    event.creator.username = currentUser.name;
+                    event.creator.id = req.session.loginUser.id;
+                    event.creator.username = req.session.loginUser.username;
                     //save event to db
                     event.save();
                     //add this event to user
@@ -261,7 +266,7 @@ app.post('/user/event',function (req,res) {
 
 
 /* a logged user edit event*/
-app.put('/user/event/:id',function (req,res) {
+app.put('/user/event/:id',checkUserEvent,function (req,res) {
 	// console.log(req.params.id);
 	// console.log(req.body.event);
 
@@ -270,15 +275,15 @@ app.put('/user/event/:id',function (req,res) {
            console.log(err);
            res.status(400).send({'msg':'find-event-failed'});
        }else{
-           if (event.creator.username === currentUser.name || event.visibility === 'private'){
+           if (event.creator.username === req.session.loginUser.username|| event.visibility === 'private'){
                Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
                    if (err){
                        console.log(err);
                        res.status(400).send({'msg':'update-event-failed'});
                    }else{
                        //event creator remains the same
-                       event.creator.id = currentUser.id;
-                       event.creator.username = currentUser.name;
+                       event.creator.id = req.session.loginUser.id;
+                       event.creator.username = req.session.loginUser.username;
                        //save event to db
                        event.save();
                        console.log('Update event successfully!');
@@ -302,13 +307,13 @@ app.put('/user/event/:id',function (req,res) {
 
 
 /* a logged user delete event*/
-app.delete('/user/event/:id', function (req,res) {
+app.delete('/user/event/:id',checkUserEvent, function (req,res) {
     Event.findById(req.params.id,function (err,event) {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-event-failed'});
         }else{
-            if (event.creator.username === currentUser.name || event.visibility === 'private'){
+            if (event.creator.username === creq.session.loginUser.username || event.visibility === 'private'){
                 User.findById(event.creator.id,function (err,user) {
                     if (err){
                         console.log(err);

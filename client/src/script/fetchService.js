@@ -9,6 +9,7 @@ export const userLogin = async (path, userInfo) => {
         const res = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(userInfo),
+            credentials:'include',
         });
 
         return await res.json();
@@ -25,6 +26,7 @@ export const userSignup = async (path, userInfo) => {
         const res = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(userInfo),
+            credentials:'include',
         });
 
         return await res.json();
@@ -46,6 +48,7 @@ export const getUserEvents = async (path) => {
             Origin: 'http://localhost:5000',
             headers: { 'Accept': 'application/json' },
             mode: 'cors',
+            credentials:'include',
         });
 
         return await res.json();
@@ -66,6 +69,7 @@ export const createEvent = async (path, event) => {
             body: JSON.stringify({
                 event,
             }),
+            credentials:'include',
         });
 
         return await res.json();
@@ -86,6 +90,7 @@ export const editEvent = async (path, event) => {
             body: JSON.stringify({
                 event,
             }),
+            credentials:'include',
         });
 
         return await res.json();
@@ -106,6 +111,7 @@ export const deleteEvent = async (path, event) => {
             body: JSON.stringify({
                 event,
             }),
+            credentials:'include',
         });
 
         return await res.json();

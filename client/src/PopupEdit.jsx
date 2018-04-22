@@ -73,7 +73,7 @@ class PopupEdit extends Component {
 	handleDeleteEvent() {
 		const { event, closePopup, updateEvents } = this.props;
 
-		deleteEvent(`user/event/${ event._id }`)
+		deleteEvent(`user/event/${ event._id }`, event)
 		.then( result => {
 			if ( result.isDeleted ) {
 				updateEvents();
