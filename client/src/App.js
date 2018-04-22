@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+import { withCookies, CookiesProvider } from 'react-cookie';
+import { instanceOf } from 'prop-types';
 
 // Components
 import Header from './Header';
@@ -15,6 +17,8 @@ import { getUserEvents } from './script/fetchService.js';
 class App extends Component {
 	constructor(props) {
 		super(props);
+		
+
 		this.state = {
 			currentDate: cal.today(),
 			currentUser: {},
@@ -37,6 +41,7 @@ class App extends Component {
 
 	componentDidMount() {
 		window.addEventListener('keydown', this.handleKeyDown);
+		this.getEvents();
 	}
 
 	login(user) {

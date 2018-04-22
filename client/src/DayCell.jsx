@@ -31,6 +31,7 @@ class DayCell extends Component {
 	}
 
 	togglePopupEdit() {
+		console.log('Toggle edit');
 		this.setState( prevState => ({
 			isPopupAddOpen: false,
 			isPopupEditOpen: !prevState.isPopupEditOpen 
@@ -90,7 +91,7 @@ class DayCell extends Component {
 				{ dayContent }
 				<Modal>
 	      			{ this.state.isPopupAddOpen ? <PopupAdd date={ ymd }  currentUser={ currentUser } updateEvents={ updateEvents } closePopup={ this.togglePopupAdd } /> : null }
-	      			{ this.state.isPopupEditOpen ? <PopupEdit user={ currentUser } event={ currentEvent } updateEvents={ updateEvents } closePopup={ this.togglePopupEdit } /> : null }
+	      			{ this.state.isPopupEditOpen ? <PopupEdit currentUser={ currentUser } event={ currentEvent } updateEvents={ updateEvents } closePopup={ this.togglePopupEdit } /> : null }
 	      		</Modal>
 			</div>
 		);
