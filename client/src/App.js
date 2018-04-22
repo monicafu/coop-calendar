@@ -18,7 +18,7 @@ class App extends Component {
 		super(props);
 		this.state = {
 			currentDate: cal.today(),
-			currentUser: JSON.parse(cookie.loadAll().user) || {},
+			currentUser: cookie.loadAll().user ? JSON.parse(cookie.loadAll().user) : {},
 			events: [],
 			searchContent: '',
 			isLoginOpen: false,
