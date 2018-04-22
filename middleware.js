@@ -1,6 +1,6 @@
 const Event = require("./models/event");
 
-const middleware = {
+module.exports  = {
     isLoggedIn: (req, res, next) => {
         console.log(req.session);
         console.log('middleware');

@@ -69,7 +69,7 @@ app.use((req,res, next) => {
 
 
 // --- service ---
-const {isLoggedIn,checkUserEvent} = require('./middleware.js');
+const {isLoggedIn,checkUserEvent} = require('./middleware');
 
 // ---      encryption function   ---
 function cryptPwd(password) {
@@ -105,7 +105,8 @@ app.post('/login', (req, res ) =>  {
             password:currUser.password
         }, function (err, data) {
                 if(err){
-                    console.log(err);              
+                    console.log(err);   
+                    res.status(400).send({isLogin:false, msg: "username or password is not correct"});           
                 }
                 req.session.loginUser = {
                     username: data.username,
@@ -165,8 +166,8 @@ app.post('/register', (req, res ) =>  {
 // --- LogOut --- //
 
 app.get('/logout',(req, res) => {
-    currentUser.id = "";
-    currentUser.name ="";
+    // currentUser.id = "";
+    // currentUser.name ="";
     req.logout();
 });
 
@@ -191,7 +192,7 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
+app.get('/user/:id/:year/:month',(req, res) => {
     console.log(req.session.loginUser);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
