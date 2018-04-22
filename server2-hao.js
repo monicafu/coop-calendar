@@ -193,7 +193,6 @@ app.get('/auth/google/redirect',
 
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
-    console.log(req.session.loginUser);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
@@ -349,6 +348,7 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
                         console.log(err);
                         res.status(400).send({isDeleted :false,'msg':'delete-event-failed'});
                     }else{
+                        console.log('delete a event successfully!');
                         req.flash('success','delete event successfully!');
                         res.status(200).send({
                             isDeleted :true
