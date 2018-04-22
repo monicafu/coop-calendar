@@ -180,30 +180,16 @@ app.post('/register', (req, res ) =>  {
 
 app.get('/logout',(req, res) => {
     //console.log(req.session);
-    console.log(req.cookies);
-    req.session.loginUser = null;
-    res.clearCookie("user");
-    console.log('delete cookie');
-    //console.log(req.session);
     //console.log(req.cookies);
+    req.session.loginUser = null;
+    res.clearCookie('user');
+    console.log('delete cookie');
     if (req.session.loginUser) {
         res.status(400).send({msg:'Login out failed',isLogin:true});
     }else{
         console.log('success');
         res.status(200).send({isLoginOut:true, msg: "Login out Successfully" });  
     }
-    /*
-    req.session.destroy(function(err) {
-        if(err){
-            res.status(400).send({msg:'Login out failed',isLogin:true});
-            return;
-        }
-        req.session.loginUser = null;
-        res.clearCookie('mysession');
-        res.clearCookie('user');
-        res.status(200).send({isLoginOut:true, msg: "Login out Successfully" });  
-    });
-    */
 });
 
 
@@ -225,12 +211,7 @@ app.get('/auth/google/redirect',
                         username: req.user.username,
                         id: req.user._id,
         }));
-        //console.log(res.cookies);
-        //res.redirect('/user/:id/:year/:month');
-        //res.redirect('/login');
-        //res.send(req.user);
         res.redirect('http://localhost:3000');
-        //res.redirect('/');
     });
 
 
