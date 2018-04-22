@@ -14,10 +14,15 @@ const express   = require('express'),
     deasync = require('deasync'),
     MongoStore = require('connect-mongo')(session);
     //RedisStore = require('connect-redis')(session);
+    // cookiesMiddleware = require('universal-cookie-express');
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use( bodyParser.json({ extended: true, type: '*/*' }) );
 app.use(cookieParser());
+// app.use(cookiesMiddleware());
+// app.use(function(req, res) {
+// 	req.universalCookies.get('test')
+// });
 //const jsonParser = bodyParser.json({extended: true, type: '*/*'});
 
 // --- db connection ---
@@ -114,11 +119,11 @@ app.post('/login', (req, res ) =>  {
                     };
                   
                     //console.log(req.session);
-                    console.log('req' + req.sessionID)
-                    res.cookie('user',{
-                        username: data.username,
-                        userId: data._id
-                    });
+                    console.log('line122: req' + req.sessionID)
+                    res.cookie('user', JSON.stringify({
+                    	username: data.username,
+                    	id: data._id,
+                    }));
                     res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});    
                 }   
             }                        
@@ -209,7 +214,7 @@ app.get('/auth/google/redirect',
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
     console.log(req.cookies);
-    console.log('req session' + req.sessionID);
+    console.log('line:217 req session' + req.sessionID);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];

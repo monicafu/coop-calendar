@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import { withCookies, CookiesProvider } from 'react-cookie';
-import { instanceOf } from 'prop-types';
 
 // Components
 import Header from './Header';
@@ -13,15 +11,14 @@ import Login from './Login';
 // Functions
 import cal from './script/dateCalculator.js';
 import { getUserEvents } from './script/fetchService.js';
+import cookie from 'react-cookies';
 
 class App extends Component {
 	constructor(props) {
 		super(props);
-		
-
 		this.state = {
 			currentDate: cal.today(),
-			currentUser: {},
+			currentUser: JSON.parse(cookie.loadAll().user) || {},
 			events: [],
 			searchContent: '',
 			isLoginOpen: false,
@@ -73,7 +70,6 @@ class App extends Component {
 				events = result.sendEvents.map( event => {
 					event.startDate = new Date( event.startDate );
 					event.endDate = new Date( event.endDate );
-					// console.log(event);
 					return event;
 				} );
 
