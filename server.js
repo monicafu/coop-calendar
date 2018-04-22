@@ -8,7 +8,7 @@ const express   = require('express'),
     env = require('./config/env.json'),
     PORT     = env.SERVER_PORT,
     passport = require('./config/passport-setup'),
-    session = require("express-session"),
+    session = require('express-session'),
     flash    = require("connect-flash"),
     deasync = require('deasync');
 
