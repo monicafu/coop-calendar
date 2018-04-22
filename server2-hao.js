@@ -69,7 +69,7 @@ app.use((req,res, next) => {
 
 
 // --- service ---
-const {isLoggedIn,checkUserEvent} = require('./middleware.js');
+const {isLoggedIn,checkUserEvent} = require('./middleware');
 
 // ---      encryption function   ---
 function cryptPwd(password) {
@@ -91,7 +91,7 @@ app.post('/login', (req, res ) =>  {
     const pass = userInfo.password;
 
     if (user === 'null' || pass === 'null') {
-        res.status(200).send({msg:'The input cannot be null', isLogin:false});
+        res.status(400).send({msg:'The input cannot be null', isLogin:false});
     }else{
         //add salt
         const currPass = cryptPwd(pass);
@@ -105,7 +105,8 @@ app.post('/login', (req, res ) =>  {
             password:currUser.password
         }, function (err, data) {
                 if(err){
-                    console.log(err);              
+                    console.log(err);   
+                    res.status(400).send({isLogin:false, msg: "username or password is not correct"});           
                 }
                 req.session.loginUser = {
                     username: data.username,
@@ -128,7 +129,7 @@ app.post('/register', (req, res ) =>  {
     const pass2 = userInfo.vpassword;
 
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
-        res.status(200).send({msg:'The input is not valid', isRegister:false});
+        res.status(400).send({msg:'The input is not valid', isRegister:false});
     }else{
         if (pass1 === pass2) {
             const currPass = cryptPwd(pass1);
@@ -144,7 +145,7 @@ app.post('/register', (req, res ) =>  {
                 }
                 // if the user has existed
                 if (data) {
-                    res.status(200).send({msg:'The username has existed',isRegister:false});
+                    res.status(400).send({msg:'The username has existed',isRegister:false});
                 }else{
                     console.log("create user...");
                     User.create(currUser, (err) => {
@@ -155,7 +156,7 @@ app.post('/register', (req, res ) =>  {
             });
         }
         else{
-            res.status(200).send({msg:'The passwords are not equal',isRegister:false});
+            res.status(400).send({msg:'The passwords are not equal',isRegister:false});
         }
     }
 
@@ -165,8 +166,8 @@ app.post('/register', (req, res ) =>  {
 // --- LogOut --- //
 
 app.get('/logout',(req, res) => {
-    currentUser.id = "";
-    currentUser.name ="";
+    // currentUser.id = "";
+    // currentUser.name ="";
     req.logout();
 });
 
@@ -191,18 +192,27 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
-    console.log(req.session.loginUser);
+app.get('/user/:id/:year/:month',(req, res) => {
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
-
+    let count = 0, length = 0; 
+    Event.find({visibility:'public'},(err,event)=>{
+        if (err) {
+            console.log(err);
+        }else{
+            sendEvents.push(event);
+            // console.log('public event: '+sendEvents);
+            length += sendEvents.length;
+            count = length;
+        }
+    });
     User.findById(req.params.id,(err, user) => {
         if (err){
             console.log(err);
             res.status(400).send({'msg':'find-user-failed'});
         }else{
-            let count =0, length = user.events.length;
+            length += user.events.length;
             for (let eventId of user.events){
                  Event.findById(eventId, (err,event) => {
                      if (err){
@@ -210,7 +220,7 @@ app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
                          res.status(400).send({'msg':'find-event-failed'});
                      }else{
                          let obj = {};
-                         if (event !== null){
+                         if (event !== null && event.visibility === 'private'){
                              if ((year >= parseInt(event.startDate.getFullYear())  &&  year <= parseInt(event.endDate.getFullYear()))
                                  && (month >= parseInt(event.startDate.getMonth()) && month <= parseInt(event.startDate.getMonth()))){
                                  Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
@@ -222,7 +232,8 @@ app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
                 });
             }
             deasync.loopWhile(() => count < length);
-
+            // console.log('==================');
+            // console.log('all event: '+sendEvents);
             res.status(200).send(
                 JSON.stringify({
                     sendEvents
@@ -234,74 +245,81 @@ app.get('/user/:id/:year/:month',isLoggedIn,(req, res) => {
 
 /* a logged user create event*/
 app.post('/user/event',isLoggedIn,function (req,res) {
-    User.findById(req.session.loginUser.id,function (err,user) {
-        if (err){
-            console.log(err);
-            res.status(400).send({'msg':'find-user-id-failed'});
-        }else{
-            Event.create(req.body.event,function (err, event) {
-                if (err){
-                    console.log(err);
-                    res.status(400).send({'msg':'create-event-failed'});
-                }else{
-                    //create event and add user
-                    event.creator.id = req.session.loginUser.id;
-                    event.creator.username = req.session.loginUser.username;
-                    //save event to db
-                    event.save();
-                    //add this event to user
-                    user.events.push(event);
-                    user.save();
-                    console.log('success,Created a new event!');
-                    //req.flash('success','Created a new event!');
-                    res.status(200).send({
-                        eventId: event._id,
-                        isCreated :true
-                    });
-                }
-            });
-        }
-    });
+    const event = req.body.event;
+    if ( event == null || event.title == null || event.endDate < event.startDate){
+        res.status(400).send({isCreated :false,'msg':'create-event-is-not-valid'});
+    }else{
+        User.findById(req.session.loginUser.id,function (err,user) {
+            if (err){
+                console.log(err);
+                res.status(400).send({isCreated :false,'msg':'find-user-id-failed'});
+            }else{
+                Event.create(req.body.event,function (err, event) {
+                    if (err){
+                        console.log(err);
+                        res.status(400).send({isCreated :false,'msg':'create-event-failed'});
+                    }else{
+                        //create event and add user
+                        event.creator.id = req.session.loginUser.id;
+                        event.creator.username = req.session.loginUser.username;
+                        //save event to db
+                        event.save();
+                        //add this event to user
+                        user.events.push(event);
+                        user.save();
+                        console.log('success,Created a new event!');
+                        req.flash('success','Created a new event!');
+                        res.status(200).send({
+                            eventId: event._id,
+                            isCreated :true
+                        });
+                    }
+                });
+            }
+        });
+    }  
 });
 
 
 /* a logged user edit event*/
 app.put('/user/event/:id',checkUserEvent,function (req,res) {
-	// console.log(req.params.id);
-	// console.log(req.body.event);
-
-    Event.findById(req.params.id,function (err,event) {
-       if (err){
-           console.log(err);
-           res.status(400).send({'msg':'find-event-failed'});
-       }else{
-           if (event.creator.username === req.session.loginUser.username|| event.visibility === 'private'){
-               Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
-                   if (err){
-                       console.log(err);
-                       res.status(400).send({'msg':'update-event-failed'});
-                   }else{
-                       //event creator remains the same
-                       event.creator.id = req.session.loginUser.id;
-                       event.creator.username = req.session.loginUser.username;
-                       //save event to db
-                       event.save();
-                       console.log('Update event successfully!');
-                       //req.flash('success','Update event successfully!');
-                       res.status(200).send({
-                           isUpdated :true
-                       });
-                   }
-               });
+    if(event == null || event.title == null || event.endDate < event.startDate){
+        res.status(400).send({isUpdated :false,'msg':'update-event-is-not-valid'});
+    }else{
+        Event.findById(req.params.id,function (err,event) {
+           if (err){
+               console.log(err);
+               res.status(400).send({isUpdated :false,'msg':'find-event-failed'});
            }else{
-               console.log("error,user don't have permission to do that!");
-               //req.flash("error", "You don't have permission to do that!");
-               res.status(200).send({
-                   isUpdated :false
-               });
+               if (event.creator.username === req.session.loginUser.username|| event.visibility === 'private'){
+                   Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
+                       if (err){
+                           console.log(err);
+                           res.status(400).send({isUpdated :false,'msg':'update-event-failed'});
+                       }else{
+                           //event creator remains the same
+                           event.creator.id = req.session.loginUser.id;
+                           event.creator.username = req.session.loginUser.username;
+                           //save event to db
+                           event.save();
+                           console.log('Update event successfully!');
+                           req.flash('success','Update event successfully!');
+                           res.status(200).send({
+                               isUpdated :true
+                           });
+                       }
+                   });
+               }else{
+                   console.log("error,user don't have permission to do that!");
+                   req.flash("error", "You don't have permission to do that!");
+                   res.status(200).send({
+                       isUpdated :false
+                   });
+               }
            }
-       }
-    });
+        });
+    }
+    
 });
 
 
@@ -311,9 +329,9 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
     Event.findById(req.params.id,function (err,event) {
         if (err){
             console.log(err);
-            res.status(400).send({'msg':'find-event-failed'});
+            res.status(400).send({isDeleted :false,'msg':'find-event-failed'});
         }else{
-            if (event.creator.username === creq.session.loginUser.username || event.visibility === 'private'){
+            if (event.creator.username === req.session.loginUser.username || event.visibility === 'private'){
                 User.findById(event.creator.id,function (err,user) {
                     if (err){
                         console.log(err);
@@ -328,9 +346,10 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
                 Event.findByIdAndRemove(req.params.id,function (err) {
                     if (err){
                         console.log(err);
-                        res.status(400).send({'msg':'delete-event-failed'});
+                        res.status(400).send({isDeleted :false,'msg':'delete-event-failed'});
                     }else{
-                        //req.flash('success','delete event successfully!');
+                        console.log('delete a event successfully!');
+                        req.flash('success','delete event successfully!');
                         res.status(200).send({
                             isDeleted :true
                         });
@@ -338,7 +357,7 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
                 });
             }else{
                 console.log("error,user don't have permission to do that!");
-                //req.flash("error", "You don't have permission to do that!");
+                req.flash("error", "You don't have permission to do that!");
                 res.status(200).send({
                     isDeleted :false
                 });
