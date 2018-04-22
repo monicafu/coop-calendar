@@ -206,7 +206,12 @@ app.get('/auth/google', passport.authenticate('google',{
 app.get('/auth/google/redirect',
     passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
-        console.log(req.user);
+        req.session.loginUser = {
+                        username: req.user.username,
+                        id: req.user._id,
+                    };
+        //console.log(req.user);
+        //console.log(req.session);
         res.cookie('user', JSON.stringify({
                         username: req.user.username,
                         id: req.user._id,
