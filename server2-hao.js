@@ -112,7 +112,13 @@ app.post('/login', (req, res ) =>  {
                         username: data.username,
                         id: data._id
                     };
-                res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});      
+                    //console.log(req.session);
+                    console.log('req' + req.sessionID)
+                    res.cookie('user',{
+                        username: data.username,
+                        userId: data._id
+                    });
+                    res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});      
                 }   
             }                        
         });
@@ -167,9 +173,16 @@ app.post('/register', (req, res ) =>  {
 // --- LogOut --- //
 
 app.get('/logout',(req, res) => {
-    // currentUser.id = "";
-    // currentUser.name ="";
-    req.logout();
+    console.log(req.session);
+    req.session.destroy(function(err) {
+        if(err){
+            res.status(400).send({msg:'Login out failed',isLogin:true});
+            return;
+        }
+        req.session.loginUser = null;
+        res.clearCookie('mysession');
+        res.status(200).send({isLoginOut:true, msg: "Login out" });  
+    });
 });
 
 
@@ -194,6 +207,8 @@ app.get('/auth/google/redirect',
 
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
+    console.log(req.cookies);
+    console.log('req session' + req.sessionID);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
@@ -283,6 +298,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 /* a logged user edit event*/
 app.put('/user/event/:id',checkUserEvent,function (req,res) {
+    const event = req.body.event;
     if(event == null || event.title == null || event.endDate < event.startDate){
         res.status(400).send({isUpdated :false,'msg':'update-event-is-not-valid'});
     }else{
@@ -300,6 +316,7 @@ app.put('/user/event/:id',checkUserEvent,function (req,res) {
                            //event creator remains the same
                            event.creator.id = req.session.loginUser.id;
                            event.creator.username = req.session.loginUser.username;
+                           console.log(req.sessionID);
                            //save event to db
                            event.save();
                            console.log('Update event successfully!');
