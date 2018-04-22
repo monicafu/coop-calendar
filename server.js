@@ -16,7 +16,7 @@ const express   = require('express'),
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use(bodyParser.json({ extended: true, type: '*/*' }) );
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieParser('secret'));
 
 // --- db connection ---
 mongoose.connect(`mongodb://${env.DB_HOST}/calendar`);
@@ -34,7 +34,12 @@ db.once('open', function() {
 app.use(session({
     secret: env.sessionSecret,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    // cookie{
+    //     secure: true,
+    //     maxAge: 60000,
+    //     httpOnly: true
+    // }
 }));
 // --- passport enable
 app.use(passport.initialize());
@@ -65,7 +70,7 @@ app.use((req,res, next) => {
 
 
 // --- service ---
-const {isLoggedIn,checkUserEvent} = require('./middleware.js');
+const middleware = require('./middleware.js');
 
 // --- Router ---
 // ---      Login         ---//
@@ -73,12 +78,15 @@ app.post('/login', passport.authenticate('local',
     {
         failureFlash: 'Invalid username or password',
         successFlash: 'Welcome'
-    }),(req, res) => {
-    console.log("auth success? "+ req.user.username);
-    const userInfo = req.body;
-    const username = userInfo.username;
-    const pass = userInfo.password;
-    console.log("username && password : " + username +" , "+ pass);
+    }),(req, res, next) => {
+    console.log("auth success? "+ req.user.username + "..."+req.isAuthenticated());
+    ///Very important to not to forget to do below!!
+    req.logIn(req.user,function(err){
+        if(err){
+            return done(null,false,req.flash('loginMessage','Something went wrong.'+err));
+        }
+    });
+    console.log("use is logged in : " + req.user.username);
     res.status(200).send({userId: req.user._id, username: req.user.username, isLogin:true, msg: "Login success"});
 });
 
@@ -96,7 +104,7 @@ app.post('/register', (req, res) =>  {
     }else{
         if (pass1 === pass2) {
             const newUser = new User({username : username});
-            User.register(newUser,pass1,function (err,user) {
+            User.register(newUser,pass1,function (err,user){
                 if (err){
                     console.log(err);
                     req.flash("error", err.message);
@@ -124,6 +132,7 @@ app.post('/register', (req, res) =>  {
 app.get('/logout',(req, res) => {
     req.logout();
     // req.flash("success", "LOGGED YOU OUT!");
+    res.send(200).stringify({msg : 'user-logout-success',isLogout: true});
 });
 
 
@@ -147,7 +156,9 @@ app.get('/auth/google/redirect',
 
 
 /* Get a user's events by year/month*/
-app.get('/user/:id/:year/:month',isLoggedIn, (req,res) => {
+app.get('/user/:id/:year/:month',middleware.isLoggedIn,(req,res) => {
+    console.log('session: '+req.session);
+    console.log('get user: '+ res.locals.currentUser+ "..."+req.user);
     const year = parseInt(req.params.year);
     const month = parseInt(req.params.month);
     let sendEvents = [];
@@ -188,7 +199,7 @@ app.get('/user/:id/:year/:month',isLoggedIn, (req,res) => {
 
 
 /* a logged user create event*/
-app.post('/user/event',isLoggedIn, (req,res) => {
+app.post('/user/event',middleware.isLoggedIn, (req,res) => {
     console.log('get userId  '+ req.body.id);
     User.findById(req.body.id,function (err,user) {
         if (err){
@@ -222,7 +233,7 @@ app.post('/user/event',isLoggedIn, (req,res) => {
 
 
 /* a logged user edit event*/
-app.put('/user/event/:id',checkUserEvent,(req,res) => {
+app.put('/user/event/:id',middleware.checkUserEvent,(req,res) => {
     Event.findById(req.params.id,function (err,event) {
        if (err){
            console.log(err);
@@ -260,7 +271,7 @@ app.put('/user/event/:id',checkUserEvent,(req,res) => {
 
 
 /* a logged user delete event*/
-app.delete('/user/event/:id',checkUserEvent,(req,res) => {
+app.delete('/user/event/:id',middleware.checkUserEvent,(req,res) => {
     Event.findById(req.params.id,function (err,event) {
         if (err){
             console.log(err);
