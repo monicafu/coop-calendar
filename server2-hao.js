@@ -112,13 +112,14 @@ app.post('/login', (req, res ) =>  {
                         username: data.username,
                         id: data._id
                     };
+                  
                     //console.log(req.session);
                     console.log('req' + req.sessionID)
                     res.cookie('user',{
                         username: data.username,
                         userId: data._id
                     });
-                    res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});      
+                    res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});    
                 }   
             }                        
         });

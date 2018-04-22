@@ -13,8 +13,18 @@ import { editEvent, deleteEvent } from './script/fetchService.js';
 class PopupEdit extends Component {
 	constructor(props) {
 		super(props);
+		const tmpEvent= props.event;
 		this.state = {
-			event: props.event,
+			event: {
+				title: tmpEvent.title,
+				description: tmpEvent.description,
+				startDate: tmpEvent.startDate,
+				endDate: tmpEvent.endDate,
+				visibility: tmpEvent.visibility,
+				location: tmpEvent.location,
+				creator: tmpEvent.creator,
+				_id: tmpEvent._id, 
+			},
 			warning: {
 				title: '',
 				date: '',
@@ -56,12 +66,10 @@ class PopupEdit extends Component {
 
 			editEvent(`user/event/${ event._id }`, event)
 			.then( result => {
-				if ( result.isUpdatede ) {
+				if ( result.isUpdated ) {
 					updateEvents();
 					closePopup();
 				}
-
-				this.resetLoading();
 			})
 			.catch( error => {
 				console.log(error);
@@ -79,8 +87,6 @@ class PopupEdit extends Component {
 				updateEvents();
 				closePopup();
 			}
-
-			this.resetLoading();
 		})
 		.catch( error => {
 			console.log(error);
@@ -169,10 +175,9 @@ class PopupEdit extends Component {
 	}
 
 	render() {
-		const { user, closePopup } = this.props;
+		const { currentUser, closePopup } = this.props;
 		const { event, warning, editLoading, deleteLoading } = this.state;
-		const isCreator = user.username === event.creator.username ? true : false;
-		// const isCreator = true;
+		const isCreator = currentUser.username === event.creator.username ? true : false;
 
 		return (
 			<div className="popup-edit">
