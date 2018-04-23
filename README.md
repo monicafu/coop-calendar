@@ -1,49 +1,70 @@
 # Calendar
 
-## Team
+## Team Roles
 
-### Roles
+> Hao Tian
 
-#### Hao Tian
-Duty: login module 
+- Duty: login module 
 
-#### Jing Fu
-Duty: server services, mongoDB
+> Jing Fu
 
-#### Hongbin Li
-Duty: UI&UX design, react / html / css
+- Duty: server services, mongoDB
+
+>  Hongbin Li
+
+- Duty: UI&UX design, react / html / css
 
 ## Functions
+#### 1. Main Page
 
-### Archieve
-Browse events in main page
+* Browse events in main page
+* Paginate by month
+* Back to today
+* Current user status(login or logout)
 
-### Pagination
-Paginate by month
+#### 2. Event Management
 
-### Register + Login
-Register by username and password
+* Add Event 
+  - Add event by the top navigation or each day cell 
+  - Event has the attributes of title/startDate/endDate/location/visibility(public or private)/note
+  - public events are explicitly to everyone who has logined in
+  - private events only show to the user who created them
+* Edit Event 
+  - Private event can only be edited by the creator   
+  - Public event can be edited by anyone
+* Delete Event 
+  - Event can only be deleted by the creator 
+* Show Event
+  - Users can see public events and their own(private) events in the main page
 
-### Events management
-1. Add(main & cells)
-2. Delete
-3. Edit
+#### 3. Register & Login
 
-### Jump + Today
-1. Jump to any date
-2. Back to today
+- Register by username and password
+- Login with username and password
+- Login by  Google oAuth 
 
-### Search
-1. Search date
-2. Search events
+#### 4. Security
 
-### Reminder
-Remind upcoming events in several days
+* Add whitelisting input check for password ( letter & number, at least 6 digits)
+* Add input validation
+* Server do not trust client data
+* Encrypt passwords before they are stored in database
+* Client can only get the username and userID from backend
+* Use xss-filter to prevent XSS attacks
+* Add xss-filter to every input from client
 
-### User Management (Plan)
+#### 5. Future Plan
+
+* Search date and events
+* Remind upcoming events in several days
+* User Management (edit profile)
 
 ## Data
-### User
+
+- Use Mongo db to achieve data persistance 
+- Deploy mongo DB at mLab.com
+#### User
+
     {
         "userId" :
         "userName" :
@@ -51,7 +72,8 @@ Remind upcoming events in several days
         "events" :
     }
 
-### Event
+#### Event
+
     {
         "eventId" :
         "title" :
@@ -59,8 +81,32 @@ Remind upcoming events in several days
         "startDate" :
         "endDate" :
         "creater" :
-        "category" :
+        "visibility":
         "location" : 
     }
+#### SESSION
 
-##Views
+    {
+        "sessionId" :
+        "session":{
+            "cookie":{
+                "originalMaxAge":
+                "expires":
+                "secure":
+                "httpOnly":
+            }
+            "loginUser":{
+                "id":
+                "username":
+            }
+            "passport":{
+                "user":
+            }
+        }
+    }
+### Views
+补充一个主页面？
+### Deployment url: 
+heroku url:
+
+
