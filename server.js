@@ -98,7 +98,7 @@ app.post('/login', (req, res ) =>  {
     const pass = xssFilters.inHTMLData(userInfo.password);
     console.log(user+" , "+pass);
     if (user === 'null' || pass === 'null') {
-        res.status(400).send({msg:'The input cannot be null', isLogin:false});
+        res.status(400).send({msg:'Input cannot be null', isLogin:false});
     }else{
         //add salt
         const currPass = cryptPwd(pass);
@@ -106,14 +106,13 @@ app.post('/login', (req, res ) =>  {
             username: user.toLowerCase(),
             password: currPass
         };
-        //console.log(currUser);
         User.findOne({
             username:currUser.username,
             password:currUser.password
         }, function (err, data) {
             if(err){
                 console.log(err);   
-                res.status(400).send({isLogin:false, msg: "username or password is not correct"});           
+                res.status(400).send({isLogin:false, msg: "Unknown reason"});           
             }else{
                 if (data) {
                    req.session.loginUser = {
@@ -121,13 +120,15 @@ app.post('/login', (req, res ) =>  {
                         id: data._id
                     };
                   
-                    //console.log(req.session);
-                    console.log('line125: ression is' + req.sessionID)
+                    console.log('line125: ression is' + req.sessionID);
                     res.cookie('user', JSON.stringify({
                     	username: data.username,
                     	id: data._id,
                     }));
                     res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});    
+                }
+                else {
+                	res.status(200).send({isLogin:false, msg: "Username and password does not match"});
                 }   
             }                        
         });
@@ -145,7 +146,7 @@ app.post('/register', (req, res ) =>  {
     const pass2 = xssFilters.inHTMLData(userInfo.vpassword);
 
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
-        res.status(400).send({msg:'The input is not valid', isRegister:false});
+        res.status(400).send({msg:'Input is not valid', isRegister:false});
     }else{
         if (pass1 === pass2) {
             const currPass = cryptPwd(pass1);
@@ -161,18 +162,18 @@ app.post('/register', (req, res ) =>  {
                 }
                 // if the user has existed
                 if (data) {
-                    res.status(400).send({msg:'The username has existed',isRegister:false});
+                    res.status(200).send({msg:'Username has existed',isRegister:false});
                 }else{
                     console.log("create user...");
                     User.create(currUser, (err) => {
                         if(err) return console.log(err);
-                        res.status(200).send({msg:'Register Success', isRegister:true});
+                        res.status(200).send({msg:'Register success', isRegister:true});
                     });
                 }
             });
         }
         else{
-            res.status(400).send({msg:'The passwords are not equal',isRegister:false});
+            res.status(200).send({msg:'Input passwords are not equal',isRegister:false});
         }
     }
 
