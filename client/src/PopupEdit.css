@@ -101,6 +101,10 @@
 	transition: .2s;
 }
 
+.popup-edit .btn-save-whole {
+	border-radius: 5px;
+}
+
 .popup-edit .btn-save:hover {
 	background-color: #4a9b6f;
 }
