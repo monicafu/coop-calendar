@@ -25,7 +25,6 @@ mongoose.connect(env.mongoAddress);
 const User = require('./models/user');
 const Event = require('./models/event');
 
-// --- db connection test ---
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -33,16 +32,15 @@ db.once('open', function() {
 });
 
 // --- passport configuration ---
-// app.use(flash());
-//passport init,setting password to work on application
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+
 //reading session and take the code from session that's encode and uncode it
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-//session
+// --- session config ---
 
 app.use(session({
     secret: env.sessionSecret,
@@ -50,7 +48,7 @@ app.use(session({
     saveUninitialized: false,  
     resave: false,  
     cookie: {
-        maxAge: 1800 * 1000, 
+        maxAge: 1800 * 1000, //half an hour
         secure: false,
     }
 }));
@@ -84,19 +82,15 @@ app.listen(PORT, () => {
     console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
 });
 
-
-
-// --- Router ---
-
-
-// ---      Login         ---//
+// --- Login ---
 app.post('/login', (req, res ) =>  {
+
 	const userInfo = req.body;
     console.log(userInfo.username+" is login");
+
     //add xss attack filter
     const user = xssFilters.inHTMLData(userInfo.username);
     const pass = xssFilters.inHTMLData(userInfo.password);
-    console.log(user+" , "+pass);
     if (user === 'null' || pass === 'null') {
         res.status(400).send({msg:'Input cannot be null', isLogin:false});
     }else{
@@ -115,19 +109,22 @@ app.post('/login', (req, res ) =>  {
                 res.status(400).send({isLogin:false, msg: "Unknown reason"});           
             }else{
                 if (data) {
-                   req.session.loginUser = {
+
+                    //set session and cookie
+                    req.session.loginUser = {
                         username: data.username,
                         id: data._id
                     };
-                  
-                    console.log('line125: ression is' + req.sessionID);
                     res.cookie('user', JSON.stringify({
                     	username: data.username,
                     	id: data._id,
                     }));
+
+                    //if we could find the user
                     res.status(200).send({userId: data._id, username: data.username, isLogin:true, msg: "Login success" + data._id + data.username});    
                 }
                 else {
+                    //if we cannot find the user
                 	res.status(200).send({isLogin:false, msg: "Username and password does not match"});
                 }   
             }                        
@@ -135,9 +132,7 @@ app.post('/login', (req, res ) =>  {
     }
 });
 
-// ---      register         ---//
-
-
+// --- register ---
 app.post('/register', (req, res ) =>  {
     const userInfo = req.body;
     //add xss attack filter
@@ -160,11 +155,11 @@ app.post('/register', (req, res ) =>  {
                 if(err) {
                     console.log(err);
                 }
-                // if the user has existed
                 if (data) {
+                    // if the user has existed
                     res.status(200).send({msg:'Username has existed',isRegister:false});
                 }else{
-                    console.log("create user...");
+                    console.log("create user sucess");
                     User.create(currUser, (err) => {
                         if(err) return console.log(err);
                         res.status(200).send({msg:'Register success', isRegister:true});
@@ -180,14 +175,10 @@ app.post('/register', (req, res ) =>  {
 });
 
 
-// --- LogOut --- //
-
+// --- LogOut --- 
 app.get('/logout',(req, res) => {
-    //console.log(req.session);
-    //console.log(req.cookies);
     req.session.loginUser = null;
-    res.clearCookie('user');
-    console.log('delete cookie');
+    res.clearCookie('user');//clear cookie
     if (req.session.loginUser) {
         res.status(400).send({isLogout:false,msg:'Login out failed'});
     }else{
@@ -204,9 +195,6 @@ app.get('/auth/google', passport.authenticate('google',{
     scope:['Profile']
 }));
 
-
-
-
 app.get('/auth/google/redirect',
     passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
@@ -218,21 +206,18 @@ app.get('/auth/google/redirect',
                         username: req.user.username,
                         id: req.user._id,
         }));
-        res.redirect('http://localhost:3000');
-    });
+        res.redirect('http://localhost:3000');//redirect website
+    }
+);
 
 
-/* Get a user's events by year/month*/
+// --- Get a user's events by year/month*/ ---
 app.get('/user/:id/:year/:month',(req, res) => {
-    // console.log(req.cookies);
-    // console.log('line:217 req session' + req.sessionID);
     const id = req.params.id;
     const year = parseInt(req.params.year);
     const thisMonth = parseInt(req.params.month);
     const nextMonth = parseInt(req.params.month)+1;
     let sendEvents = [];
-    // console.log(new Date(year,thisMonth));
-    // console.log(new Date(year,nextMonth));
     Event.find(
         {$or: [{'visibility':'public'},
             {$and: [
