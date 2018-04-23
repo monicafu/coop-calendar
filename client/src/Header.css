@@ -33,6 +33,7 @@ header .panel {
 .display {
 	display: flex;
 	font-size: 18px;
+	font-weight: bold;
 }
 
 .paging {
@@ -49,7 +50,7 @@ header .panel {
 .paging .tip {
 	position: absolute;
 	padding: 3px 5px;
-	top: 100%;
+	top: 110%;
 	left: 0;
 	border-radius: 3px;
 	color: #f1f1f1;
@@ -57,6 +58,7 @@ header .panel {
 	text-align: left;
 	overflow: hidden;
 	font-size: 12px;
+	user-select: none;
 	transition: .1s .3s;
 	transform: scale(0);
 	transform-origin: center;
@@ -77,7 +79,7 @@ header .panel {
 
 .today {
 	display: flex;
-	background-color: #f0ca4d;
+	background-color: #1E824C;
 	padding: 2px 5px;
 	border: none;
 	border-radius: 5px;
@@ -91,7 +93,7 @@ header .panel {
 }
 
 .today:hover, .today:focus {
-	background-color: #f6df94;
+	background-color: #4a9b6f;
 }
 
 /* Search
@@ -165,8 +167,8 @@ header .panel {
 .login .username {
 	position: relative;
 	color: #202020;
-	font-size: 12px;
-	font-weight: bold;
+	font-size: 14px;
+	/*font-weight: bold;*/
 }
 
 .login .username::before {
