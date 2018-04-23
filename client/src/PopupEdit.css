@@ -35,6 +35,11 @@
 	margin: 8px 0;
 }
 
+.popup-edit .btn-group {
+	flex-direction: row;
+	justify-content: center;
+}
+
 .popup-edit label {
 	margin-bottom: 5px;
 	font-size: 12px;
@@ -77,16 +82,19 @@
 }
 
 .popup-edit .btn-save {
-	align-self: center;
+	display: flex;
+	justify-content: center;
+	flex: 1 1 0%;
 	width: 100px;
 	min-height: 25px;
 	padding: 3px 5px;
 	border: none;
-	border-radius: 5px;
+	border-radius: 5px 0 0px 5px;
 	outline: none;
-	background-color: #46b29d;
+	background-color: #1e824c;
+	color: white;
 	font-family: 'Noto Sans', sans-serif;
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
 	cursor: pointer;
@@ -94,20 +102,23 @@
 }
 
 .popup-edit .btn-save:hover {
-	background-color: #a4c1c3;
+	background-color: #4a9b6f;
 }
 
 .popup-edit .btn-delete {
-	align-self: center;
+	display: flex;
+	justify-content: center;
+	flex: 1 1 0%;
 	width: 100px;
 	min-height: 25px;
 	padding: 3px 5px;
 	border: none;
-	border-radius: 5px;
+	border-radius: 0 5px 5px 0;
 	outline: none;
-	background-color: #de5b49;
+	background-color: #797979;
+	color: white;
 	font-family: 'Noto Sans', sans-serif;
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
 	cursor: pointer;
@@ -115,7 +126,7 @@
 }
 
 .popup-edit .btn-delete:hover {
-	background-color: #a4c1c3;
+	background-color: #b1b1b1;
 }
 
 /* date-form
@@ -149,8 +160,8 @@
 	width: 68px;
 	height: 18px;
 	margin: 0;
-	background-color: #324d5c;
-	box-shadow: 0 0 0 2px #ccc;
+	background-color: #2574a9;
+	box-shadow: 0 0 0 2px #b1b1b1;
 	border-radius: 18px;
 	overflow: hidden;
 	cursor: pointer;
@@ -202,5 +213,5 @@
 }
 
 #publicity-btn:checked + .btn-label {
-	background-color: #e37b40;
+	background-color: #E87E04;
 }

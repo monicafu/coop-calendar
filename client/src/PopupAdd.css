@@ -35,6 +35,11 @@
 	margin: 8px 0;
 }
 
+.popup-add .btn-group {
+	flex-direction: row;
+	justify-content: center;
+}
+
 .popup-add label {
 	margin-bottom: 5px;
 	font-size: 12px;
@@ -77,15 +82,18 @@
 }
 
 .popup-add .btn-add {
-	align-self: center;
+	display: flex;
+	justify-content: center;
+	flex: 1 1 0%;
 	width: 100px;
 	padding: 3px 5px;
 	border: none;
 	border-radius: 5px;
 	outline: none;
-	background-color: #b7d7d9;
+	background-color: #1e824c;
+	color: white;
 	font-family: 'Noto Sans', sans-serif;
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
 	cursor: pointer;
@@ -93,7 +101,7 @@
 }
 
 .popup-add .btn-add:hover {
-	background-color: #a4c1c3;
+	background-color: #4a9b6f;
 }
 
 /* date-form
@@ -125,8 +133,8 @@
 	width: 68px;
 	height: 18px;
 	margin: 0;
-	background-color: #324d5c;
-	box-shadow: 0 0 0 2px #ccc;
+	background-color: #2574a9;
+	box-shadow: 0 0 0 2px #b1b1b1;
 	border-radius: 18px;
 	overflow: hidden;
 	cursor: pointer;
@@ -178,5 +186,5 @@
 }
 
 #publicity-btn:checked + .btn-label {
-	background-color: #e37b40;
+	background-color: #E87E04;
 }

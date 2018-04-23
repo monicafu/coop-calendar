@@ -106,9 +106,18 @@ class Login extends Component {
 						} );
 					closePage();
 				}
+				else {
+					loginWarning.uname = result.msg; 
+					this.setState({
+						loginWarning,
+					});
+					this.resetLoginInput();
+					this.resetLoading();
+				}
 			})
 			.catch( error => {
 				console.log(error);
+				this.resetLoginInput();
 				this.resetLoading();
 			});
 		}
@@ -150,8 +159,16 @@ class Login extends Component {
 					this.setState({
 						tabIndex: 0,
 					});
+					this.resetLoading();
 				}
-				this.resetLoading();
+				else {
+					signupWarning.uname = result.msg; 
+					this.setState({
+						signupWarning,
+					});
+					this.resetSignupInput();
+					this.resetLoading();
+				}
 			})
 			.catch( error => {
 				console.log(error);

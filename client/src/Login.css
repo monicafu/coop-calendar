@@ -153,13 +153,11 @@
 	min-height: 25px;
 	padding: 3px 5px;
 	margin: 5px 0;
-	/*border: 1px solid #b1b1b1;*/
 	border: none;
 	border-radius: 5px;
 	outline: none;
-	/*color: #202020;*/
 	color: white;
-	background-color: #0288d1;
+	background-color: #1e824c;
 	font-family: 'Noto Sans', sans-serif;
 	font-size: 12px;
 	font-weight: bold;
@@ -169,7 +167,6 @@
 .tab-container .btn-google {
 	display: flex;
 	justify-content: center;
-	/*min-height: 24px;*/
 	padding: 3px 5px;
 	margin: 5px 0;
 	border: 1px solid #b1b1b1;

@@ -34,7 +34,7 @@
 	height: 18px;
 	width: 20px;
 	border-radius: 5px;
-	background-color: #f0c14d;
+	background-color: #1E824C;
 	z-index: -1;
 }
 
@@ -90,11 +90,11 @@
 }
 
 .event-private {
-	background-color: #324d5c;
+	background-color: #2574A9;
 }
 
 .event-public {
-	background-color: #e37b40;
+	background-color: #E87E04;
 }
 
 .event-past {
