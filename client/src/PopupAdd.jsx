@@ -193,7 +193,7 @@ class PopupAdd extends Component {
 						<textarea id="note" type="text" name="description" placeholder="Note" onChange={ this.handleInput } />
 					</div>
 					<div className="field btn-group">
-						<button className="btn-add" onClick={ this.handleAddEvent }>{ loading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Add Event' }</button>
+						<button className="btn-add" onClick={ this.handleAddEvent }>{ loading ? <MDSpinner size={ 15 } singleColor="#ffffff" /> : 'Add Event' }</button>
 					</div>
 				</div>
 			</div>

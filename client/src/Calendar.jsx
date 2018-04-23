@@ -23,7 +23,7 @@ class Calendar extends Component {
 		let events = [];
 
 		for (let event of allEvents) {
-			if ( cal.withinDate( currentDate, event.startDate, event.endDate, day ) ) {
+			if ( cal.withinDate( new Date( currentDate.getFullYear(), currentDate.getMonth(), day ), event.startDate, event.endDate ) ) {
 				events.push(event);
 			}
 		}
