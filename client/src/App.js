@@ -7,6 +7,7 @@ import Calendar from './Calendar';
 import Modal from './Modal';
 import PopupAdd from './PopupAdd';
 import Login from './Login';
+import MDSpinner from 'react-md-spinner';
 
 // Functions
 import cal from './script/dateCalculator.js';
@@ -20,9 +21,9 @@ class App extends Component {
 			currentDate: cal.today(),
 			currentUser: cookie.loadAll().user ? JSON.parse(cookie.loadAll().user) : {},
 			events: [],
-			searchContent: '',
 			isLoginOpen: false,
 			isPopupAddOpen: false,
+			isLoading: false,
 		};
 
 		this.login = this.login.bind(this);
@@ -34,6 +35,7 @@ class App extends Component {
 		this.jumpToday = this.jumpToday.bind(this);
 		this.togglePopupAdd = this.togglePopupAdd.bind(this);
 		this.toggleLogin = this.toggleLogin.bind(this);
+		this.toggleLoading = this.toggleLoading.bind(this);
 	}
 
 	componentDidMount() {
@@ -75,6 +77,8 @@ class App extends Component {
 		let { events } = this.state;
 
 		if ( currentUser.id ) {
+			this.toggleLoading();
+
 			getUserEvents(`user/${ currentUser.id }/${ currentDate.getFullYear() }/${ currentDate.getMonth() }`)
 			.then(result => {
 				events = result.sendEvents.map( event => {
@@ -83,14 +87,14 @@ class App extends Component {
 					return event;
 				} );
 
-				// console.log(events);
-
+				this.toggleLoading();
 				this.setState({
 					events: events,
 				});
 			})
 			.catch(error => {
 				console.log(error);
+				this.toggleLoading();
 			});
 		}
 	}
@@ -144,12 +148,19 @@ class App extends Component {
 		}))
 	}
 
+	toggleLoading() {
+		this.setState( prevState => ({
+			isLoading: !prevState.isLoading,
+		}))
+	}
+
   	render() {
   		const { currentDate, currentUser, events } = this.state;
-  		const { isLoginOpen, isPopupAddOpen } = this.state;
+  		const { isLoginOpen, isPopupAddOpen, isLoading } = this.state;
 
     	return (
       		<div className="App">
+      			{ isLoading ? <div className="event-loader"><MDSpinner size={ 18 } color1='#1e824c' color2='#2574a9' color3='#e87e04' color4='#797979' /></div> : null }
 		      	<Header 
 		      		currentMonth={ currentDate.getMonth() }
 		      		currentYear={ currentDate.getFullYear() }
