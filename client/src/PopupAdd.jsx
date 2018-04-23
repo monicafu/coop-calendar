@@ -43,12 +43,12 @@ class PopupAdd extends Component {
 		let { event, warning } = this.state;
 		const { closePopup, updateEvents } = this.props;
 
-		if ( check.empty(event.title) || check.empty(event.date) ) {
+		if ( check.empty(event.title) || check.empty(event.startDate) || check.empty(event.endDate) ) {
 			if ( check.empty(event.title) ) {
-				warning.title = 'Title can not be empty';
+				warning.title = 'Title cannot be empty';
 			}
-			if ( check.empty(event.date) ) {
-				warning.date = 'Start Date and End Date can not be empty';
+			if ( check.empty(event.startDate) || check.empty(event.endDate) ) {
+				warning.date = 'Start Date and End Date cannot be empty';
 			}
 
 			this.setState({
@@ -102,21 +102,19 @@ class PopupAdd extends Component {
 		let { event, warning } = this.state;
 
 		if ( check.chronologic( selectedDay, event.endDate ) ) {
-			warning.date = 'End Date can not precede Start Date';
+			warning.date = 'Start date should not be late than End date';
 			event.startDate = event.endDate;
 			this.setState({
 				event,
 				warning,
 			});
-
-			return ;
 		}
-
-		event.startDate = selectedDay;
-
-		this.setState({
-			event,
-		});
+		else {
+			event.startDate = selectedDay;
+			this.setState({
+				event,
+			});
+		}
 	}
 
 	handleEndDayChange(selectedDay) {
@@ -125,21 +123,19 @@ class PopupAdd extends Component {
 		let { event, warning } = this.state;
 
 		if ( check.chronologic( event.startDate, selectedDay ) ) {
-			warning.date = 'End Date can not precede Start Date';
+			warning.date = 'End date should not be early than End date';
 			event.endDate = event.startDate;
 			this.setState({
 				event,
 				warning,
 			});
-
-			return ;
 		}
-
-		event.endDate = selectedDay;
-
-		this.setState({
-			event,
-		});
+		else {
+			event.endDate = selectedDay;
+			this.setState({
+				event,
+			});
+		}
 	}
 
 	resetLoading() {
