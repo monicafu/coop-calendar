@@ -12,21 +12,16 @@ const express   = require('express'),
     session = require('express-session'),
     LocalStrategy = require("passport-local"),
     deasync = require('deasync'),
-    MongoStore = require('connect-mongo')(session);
-    //RedisStore = require('connect-redis')(session);
-    // cookiesMiddleware = require('universal-cookie-express');
+    MongoStore = require('connect-mongo')(session),
+    xssFilters = require('xss-filters');
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
-app.use( bodyParser.json({ extended: true, type: '*/*' }) );
+app.use(bodyParser.json({ extended: true, type: '*/*' }) );
 app.use(cookieParser());
-// app.use(cookiesMiddleware());
-// app.use(function(req, res) {
-// 	req.universalCookies.get('test')
-// });
-//const jsonParser = bodyParser.json({extended: true, type: '*/*'});
+
 
 // --- db connection ---
-mongoose.connect(`mongodb://${env.DB_HOST}/calendar`);
+mongoose.connect(`mongodb://${env.DB_HOST}/${env.DB_NAME}`);
 const User = require('./models/user');
 const Event = require('./models/event');
 
@@ -50,14 +45,13 @@ passport.deserializeUser(User.deserializeUser());
 //session
 
 app.use(session({
-    name: 'mysession',
-    secret: 'password',  // 用来对session id相关的cookie进行签名
+    secret: env.sessionSecret,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    saveUninitialized: false,  // 是否自动保存未初始化的会话，建议false
-    resave: false,  // 是否每次都重新保存会话，建议false
+    saveUninitialized: false,  
+    resave: false,  
     cookie: {
-        maxAge: 3600 * 1000,  // 有效期，单位是毫秒
-        secure:false,  
+        maxAge: 3600 * 1000,//1h
+        secure: false,
     }
 }));
 
@@ -79,21 +73,30 @@ const {isLoggedIn,checkUserEvent} = require('./middleware');
 function cryptPwd(password) {
     const salt = env.salt;
     const saltPassword = password + ':' + salt;
-    const md5 = crypto.createHash('md5');
-    return md5.update(saltPassword).digest('hex');
+    const md5 = crypto.createHash(env.hash);
+    return md5.update(saltPassword).digest(env.digest);
 }
 
 
 
+// --- Listener ---
+app.listen(PORT, () => {
+    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
+});
+
+
 
 // --- Router ---
+
+
 // ---      Login         ---//
 app.post('/login', (req, res ) =>  {
-	const userInfo = req.body
-    console.log(userInfo.username);
-    const user = userInfo.username;
-    const pass = userInfo.password;
-
+	const userInfo = req.body;
+    console.log(userInfo.username+" is login");
+    //add xss attack filter
+    const user = xssFilters.inHTMLData(userInfo.username);
+    const pass = xssFilters.inHTMLData(userInfo.password);
+    console.log(user+" , "+pass);
     if (user === 'null' || pass === 'null') {
         res.status(400).send({msg:'The input cannot be null', isLogin:false});
     }else{
@@ -119,7 +122,7 @@ app.post('/login', (req, res ) =>  {
                     };
                   
                     //console.log(req.session);
-                    console.log('line122: req' + req.sessionID)
+                    console.log('line125: ression is' + req.sessionID)
                     res.cookie('user', JSON.stringify({
                     	username: data.username,
                     	id: data._id,
@@ -135,11 +138,11 @@ app.post('/login', (req, res ) =>  {
 
 
 app.post('/register', (req, res ) =>  {
-    // console.log(req.body);
-    const userInfo = req.body
-    const user = userInfo.username.toLowerCase();
-    const pass1 = userInfo.password;
-    const pass2 = userInfo.vpassword;
+    const userInfo = req.body;
+    //add xss attack filter
+    const user = xssFilters.inHTMLData(userInfo.username.toLowerCase());
+    const pass1 = xssFilters.inHTMLData(userInfo.password);
+    const pass2 = xssFilters.inHTMLData(userInfo.vpassword);
 
     if (user === 'null' || pass1 === 'null' || pass2 === 'null') {
         res.status(400).send({msg:'The input is not valid', isRegister:false});
@@ -185,10 +188,10 @@ app.get('/logout',(req, res) => {
     res.clearCookie('user');
     console.log('delete cookie');
     if (req.session.loginUser) {
-        res.status(400).send({msg:'Login out failed',isLogin:true});
+        res.status(400).send({isLogout:false,msg:'Login out failed'});
     }else{
         console.log('success');
-        res.status(200).send({isLoginOut:true, msg: "Login out Successfully" });  
+        res.status(200).send({isLogout:true, msg: "Login out Successfully" });
     }
 });
 
@@ -210,8 +213,6 @@ app.get('/auth/google/redirect',
                         username: req.user.username,
                         id: req.user._id,
                     };
-        //console.log(req.user);
-        //console.log(req.session);
         res.cookie('user', JSON.stringify({
                         username: req.user.username,
                         id: req.user._id,
@@ -222,62 +223,50 @@ app.get('/auth/google/redirect',
 
 /* Get a user's events by year/month*/
 app.get('/user/:id/:year/:month',(req, res) => {
-    console.log(req.cookies);
-    console.log('line:217 req session' + req.sessionID);
+    // console.log(req.cookies);
+    // console.log('line:217 req session' + req.sessionID);
+    const id = req.params.id;
     const year = parseInt(req.params.year);
-    const month = parseInt(req.params.month);
+    const thisMonth = parseInt(req.params.month);
+    const nextMonth = parseInt(req.params.month)+1;
     let sendEvents = [];
-    let count = 0, length = 0; 
-    Event.find({visibility:'public'},(err,event)=>{
-        if (err) {
-            console.log(err);
-        }else{
-            sendEvents.push(event);
-            // console.log('public event: '+sendEvents);
-            length += sendEvents.length;
-            count = length;
-        }
-    });
-    User.findById(req.params.id,(err, user) => {
+    // console.log(new Date(year,thisMonth));
+    // console.log(new Date(year,nextMonth));
+    Event.find({$or:[{'visibility':'public'},{$and:[
+        {'visibility':'private'},
+        {'creator.id': id},
+        {'startDate': {$gte:new Date(year,thisMonth)}},
+        {'endDate': {$lt:new Date(year,nextMonth)}}
+        ]}
+    ]},(err,events)=>{
+        let count = 0, length = events.length;
         if (err){
             console.log(err);
-            res.status(400).send({'msg':'find-user-failed'});
+            res.status(400).send({'msg':'find-event-failed'});
         }else{
-            length += user.events.length;
-            for (let eventId of user.events){
-                 Event.findById(eventId, (err,event) => {
-                     if (err){
-                         console.log(err);
-                         res.status(400).send({'msg':'find-event-failed'});
-                     }else{
-                         let obj = {};
-                         if (event !== null && event.visibility === 'private'){
-                             if ((year >= parseInt(event.startDate.getFullYear())  &&  year <= parseInt(event.endDate.getFullYear()))
-                                 && (month >= parseInt(event.startDate.getMonth()) && month <= parseInt(event.startDate.getMonth()))){
-                                 Object.assign(obj, JSON.parse(JSON.stringify(eventId)), JSON.parse(JSON.stringify(event)));
-                                 sendEvents.push(event);
-                             }
-                         }
-                     }
-                     count++;
-                });
-            }
-            deasync.loopWhile(() => count < length);
-            // console.log('==================');
-            // console.log('all event: '+sendEvents);
-            res.status(200).send(
-                JSON.stringify({
-                    sendEvents
-                })
-            );
+            events.forEach(event => {
+                sendEvents.push(event);
+                count++;
+            });
         }
+        deasync.loopWhile(() => count < length);
+        console.log(' event: '+ count);
+        console.log('==================');
+        console.log('total: '+ sendEvents.length);
+        res.status(200).send(
+            JSON.stringify({
+                sendEvents
+            })
+        );
     });
 });
 
 /* a logged user create event*/
 app.post('/user/event',isLoggedIn,function (req,res) {
-    const event = req.body.event;
-    if ( event == null || event.title == null || event.endDate < event.startDate){
+    const event = xssFilters.inHTMLData(req.body.event);
+    const title = xssFilters.inHTMLData(req.body.title);
+    console.log(event);
+    if ( event === null || title === null || event.endDate < event.startDate){
         res.status(400).send({isCreated :false,'msg':'create-event-is-not-valid'});
     }else{
         User.findById(req.session.loginUser.id,function (err,user) {
@@ -313,8 +302,10 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 /* a logged user edit event*/
 app.put('/user/event/:id',checkUserEvent,function (req,res) {
-    const event = req.body.event;
-    if(event == null || event.title == null || event.endDate < event.startDate){
+    const event = xssFilters.inHTMLData(req.body.event);
+    const title = xssFilters.inHTMLData(req.body.title);
+    console.log(event);
+    if(event === null || title === null || event.endDate < event.startDate){
         res.status(400).send({isUpdated :false,'msg':'update-event-is-not-valid'});
     }else{
         Event.findById(req.params.id,function (err,event) {
@@ -394,10 +385,3 @@ app.delete('/user/event/:id',checkUserEvent, function (req,res) {
     });
 });
 
-
-
-
-// --- Listener ---
-app.listen(PORT, () => {
-    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
-});
