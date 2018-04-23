@@ -1,5 +1,5 @@
 const passport = require('passport'),
-      LocalStrategy = require("passport-local").Strategy;
+    LocalStrategy = require("passport-local").Strategy;
 
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 //require('passport-google-oauth20')
@@ -70,7 +70,6 @@ passport.use(
 
 /*
 (accessToken, refreshToken, profile, done )=>{
-
 		User.findOne({password: profile.id}).then(currentUser =>{
 			if (currentUser) {
 				console.log('the user has already existed' + currentUser.username);
@@ -85,7 +84,6 @@ passport.use(
 				});
 			}
 		});
-
 	}
 */
 module.exports = passport;
