@@ -1,7 +1,7 @@
 
 
 const checkEmptyInput = (input) => {
-	if ( input === '' ) {
+	if ( !input ) {
 		return true;
 	}
 
