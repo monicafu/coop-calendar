@@ -51,6 +51,7 @@ class App extends Component {
 
 	logout() {
 		cookie.remove('user');
+		console.log('logout');
 		userLogout('logout')
 		.then( result => {
 			if (!result.isLogin) {
@@ -81,6 +82,8 @@ class App extends Component {
 					event.endDate = new Date( event.endDate );
 					return event;
 				} );
+
+				console.log(events);
 
 				this.setState({
 					events: events,
