@@ -46,8 +46,9 @@ class PopupEdit extends Component {
 	handleEditEvent() {
 		let { event, warning } = this.state;
 		const { updateEvents, closePopup } = this.props;
+		console.log('handle event');
 
-		if ( check.empty(event.title) || check.empty(event.date) ) {
+		if ( check.empty(event.title) || check.empty(event.startDate) || check.empty(event.endDate) ) {
 			if ( check.empty(event.title) ) {
 				warning.title = 'Title cannot be empty';
 			}
@@ -118,6 +119,7 @@ class PopupEdit extends Component {
 		this.resetWarning();
 
 		let { event, warning } = this.state;
+		selectedDay = new Date( selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate() );
 
 		if ( check.chronologic( selectedDay, event.endDate ) ) {
 			warning.date = 'Start date should not be late than End date';
@@ -139,6 +141,7 @@ class PopupEdit extends Component {
 		this.resetWarning();
 
 		let { event, warning } = this.state;
+		selectedDay = new Date( selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate() );
 
 		if ( check.chronologic( event.startDate, selectedDay ) ) {
 			warning.date = 'End date should not be early than End date';

@@ -60,8 +60,6 @@ class PopupAdd extends Component {
 				loading: true,
 			});
 
-			console.log( event );
-
 			createEvent('user/event', event)
 			.then( result => {
 				if ( result.isCreated ) {
@@ -71,7 +69,6 @@ class PopupAdd extends Component {
 			})
 			.catch( error => {
 				console.log(error);
-				this.resetLoading();
 			});
 		}
 	}
@@ -100,6 +97,7 @@ class PopupAdd extends Component {
 		this.resetWarning();
 
 		let { event, warning } = this.state;
+		selectedDay = new Date( selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate() );
 
 		if ( check.chronologic( selectedDay, event.endDate ) ) {
 			warning.date = 'Start date should not be late than End date';
@@ -121,6 +119,7 @@ class PopupAdd extends Component {
 		this.resetWarning();
 
 		let { event, warning } = this.state;
+		selectedDay = new Date( selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate() );
 
 		if ( check.chronologic( event.startDate, selectedDay ) ) {
 			warning.date = 'End date should not be early than End date';
