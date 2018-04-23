@@ -83,6 +83,8 @@ class App extends Component {
 					return event;
 				} );
 
+				// console.log(events);
+
 				this.setState({
 					events: events,
 				});
