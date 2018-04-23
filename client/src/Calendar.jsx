@@ -22,11 +22,14 @@ class Calendar extends Component {
 	screenEvents(allEvents, currentDate, day) {
 		let events = [];
 
+		console.log(allEvents);
 		for (let event of allEvents) {
 			if ( cal.withinDate( new Date( currentDate.getFullYear(), currentDate.getMonth(), day ), event.startDate, event.endDate ) ) {
 				events.push(event);
 			}
 		}
+
+		console.log(events);
 
 		return events; 
 	}

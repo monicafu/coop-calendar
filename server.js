@@ -233,12 +233,17 @@ app.get('/user/:id/:year/:month',(req, res) => {
     let sendEvents = [];
     // console.log(new Date(year,thisMonth));
     // console.log(new Date(year,nextMonth));
-    Event.find({$or:[{'visibility':'public'},{$and:[
-        {'visibility':'private'},
-        {'creator.id': id},
-        {'startDate': {$gte:new Date(year,thisMonth)}},
-        {'endDate': {$lt:new Date(year,nextMonth)}}
-        ]}
+    Event.find(
+        {$or: [{'visibility':'public'},
+            {$and: [
+                {'visibility':'private'},
+                {'creator.id': id},
+                {
+                    $or: [
+                        {'startDate': {$gte:new Date(year,thisMonth),$lte: new Date(year,nextMonth)}},
+                        {'endDate': {$gte:new Date(year,thisMonth),$lte: new Date(year,nextMonth)}},]
+                }]
+            }
     ]},(err,events)=>{
         let count = 0, length = events.length;
         if (err){
@@ -265,8 +270,8 @@ app.get('/user/:id/:year/:month',(req, res) => {
 /* a logged user create event*/
 app.post('/user/event',isLoggedIn,function (req,res) {
     const event = xssFilters.inHTMLData(req.body.event);
-    const title = xssFilters.inHTMLData(req.body.title);
-    console.log(event);
+    const title = xssFilters.inHTMLData(req.body.event.title);
+    console.log(event.title);
     if ( event === null || title === null || event.endDate < event.startDate){
         res.status(400).send({isCreated :false,'msg':'create-event-is-not-valid'});
     }else{
@@ -287,6 +292,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
                         event.save();
                         //add this event to user
                         user.events.push(event);
+                        console.log(JSON.stringify(event));
                         user.save();
                         console.log('success,Created a new event!');
                         res.status(200).send({
@@ -304,7 +310,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 /* a logged user edit event*/
 app.put('/user/event/:id',checkUserEvent,function (req,res) {
     const event = xssFilters.inHTMLData(req.body.event);
-    const title = xssFilters.inHTMLData(req.body.title);
+    const title = xssFilters.inHTMLData(req.body.event.title);
     console.log(event);
     if(event === null || title === null || event.endDate < event.startDate){
         res.status(400).send({isUpdated :false,'msg':'update-event-is-not-valid'});
