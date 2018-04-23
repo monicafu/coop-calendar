@@ -225,7 +225,7 @@ class PopupEdit extends Component {
 						)
 					}
 					<div className="field btn-group">
-						<button className="btn-save" onClick={ this.handleEditEvent } >{ editLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Save' }</button>
+						<button className={ `btn-save ${ isCreator ? 'null' : 'btn-save-whole' }` } onClick={ this.handleEditEvent } >{ editLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Save' }</button>
 						{ isCreator ? <button className="btn-delete" onClick={ this.handleDeleteEvent } >{ deleteLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Delete' }</button> : null }
 					</div>
 				</div>

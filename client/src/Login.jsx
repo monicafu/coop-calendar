@@ -98,12 +98,12 @@ class Login extends Component {
 			});
 
 			userLogin('login', loginInfo)
-			.then( result => {                // need to be dealt with
+			.then( result => {             
 				if ( result.isLogin ) {
-					login( { 
+					login({ 
 						id: result.userId,
 						username: result.username,
-						} );
+						});
 					closePage();
 				}
 				else {
@@ -231,7 +231,7 @@ class Login extends Component {
 									<input id="login-password" placeholder="Password" type="password" value={ loginInfo.password } onChange={ this.handleInput } />
 								</div>
 								<div className="field btn-group">
-									<button onClick={ this.handleLogin } >{ loginLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Log In' }</button>
+									<button onClick={ this.handleLogin } >{ loginLoading ? <MDSpinner size={ 15 } singleColor="#ffffff" /> : 'Log In' }</button>
 									<a className="btn-google" href="http://localhost:5000/auth/google"><img src={ google } alt="google" />Google</a>
 								</div>
 							</div>
@@ -251,7 +251,7 @@ class Login extends Component {
 									<input id="signup-vpassword" type="password" placeholder="Confirm Password" value={ signupInfo.vpassword } onChange={ this.handleInput } />
 								</div>
 								<div className="field btn-group">
-									<button onClick={ this.handleSignup }>{ signupLoading ? <MDSpinner size={ 15 } singleColor="#797979" /> : 'Create Account' }</button>
+									<button onClick={ this.handleSignup }>{ signupLoading ? <MDSpinner size={ 15 } singleColor="#ffffff" /> : 'Create Account' }</button>
 								</div>
 							</div>
 						</TabPanel>
