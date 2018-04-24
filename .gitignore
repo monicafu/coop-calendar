@@ -1,6 +1,10 @@
 ## Add entries to this file to have git not try to add them
+
 # Modules #
 node_modules/
+
+# APIkeys/passwords #
+/config/env.json
 
 # Editor molt #
 *.swp
@@ -39,6 +43,3 @@ node_modules/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# APIkeys/passwords #
-config/env.json
