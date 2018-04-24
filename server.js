@@ -15,7 +15,7 @@ const express   = require('express'),
     MongoStore = require('connect-mongo')(session),
     xssFilters = require('xss-filters');
 
-app.use(express.static(path.resolve(__dirname, './client/build')));
+app.use(express.static(path.resolve(__dirname, './build')));
 app.use(bodyParser.json({ extended: true, type: '*/*' }) );
 app.use(cookieParser());
 
