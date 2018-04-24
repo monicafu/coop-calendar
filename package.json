@@ -16,7 +16,7 @@
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
-    "heroku-postbuild": "npm install && npm install --only=dev --no-shrinkwrap && npm run react-build",
+    "heroku-postbuild": "npm install && npm install --only=dev --no-shrinkwrap && npm run react-build"
   },
   "repository": {
     "type": "git",
