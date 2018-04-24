@@ -4,7 +4,6 @@
 node_modules/
 
 # APIkeys/passwords #
-/config/env.json
 
 # Editor molt #
 *.swp
