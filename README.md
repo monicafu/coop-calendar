@@ -1,4 +1,6 @@
 # Calendar
+## Start
+    npm install
 
 ## Team Roles
 
@@ -15,6 +17,7 @@
 - Duty: UI&UX design, react / html / css
 
 ## Functions
+
 #### 1. Main Page
 
 * Browse events in main page
@@ -104,8 +107,6 @@
             }
         }
     }
-### Views
-补充一个主页面？
 ### Deployment url: 
 heroku url:
 
