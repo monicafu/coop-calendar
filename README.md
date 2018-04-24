@@ -1,6 +1,16 @@
-# Calendar
-## Start
-    npm install
+# CoopCalendar
+
+## Introduction
+CoopCalendar is an agenda-management and team-collaboration web calendar based on React.js ( front-end ), Node.js ( back-end ) and MongoDB ( database ). 
+
+## Commands
+1. Put file **env.json** into folder **/config**  
+
+2. Install dependencies  
+    `npm install`
+
+3. Start server  
+    `npm start`
 
 ## Team Roles
 
@@ -107,7 +117,9 @@
             }
         }
     }
-### Deployment url: 
-heroku url:
+
+### Deployment:
+* Platform: Heroku
+* Link:  
 
 
