@@ -41,4 +41,4 @@ ehthumbs.db
 Thumbs.db
 
 # APIkeys/passwords #
-./config/env.json
+config/env.json
