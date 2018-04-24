@@ -293,7 +293,7 @@ app.post('/user/event',isLoggedIn,function (req,res) {
 
 
 /* a logged user edit event*/
-app.put('/user/event/:id',checkUserEvent,function (req,res) {
+app.put('/user/event/:id',isLoggedIn,function (req,res) {
     const event = xssFilters.inHTMLData(req.body.event);
     const title = xssFilters.inHTMLData(req.body.event.title);
     console.log(event);
@@ -305,30 +305,27 @@ app.put('/user/event/:id',checkUserEvent,function (req,res) {
                console.log(err);
                res.status(400).send({isUpdated :false,'msg':'find-event-failed'});
            }else{
-               if (event.creator.username === req.session.loginUser.username|| event.visibility === 'private'){
-                   Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
-                       if (err){
-                           console.log(err);
-                           res.status(400).send({isUpdated :false,'msg':'update-event-failed'});
-                       }else{
-                           //event creator remains the same
-                           event.creator.id = req.session.loginUser.id;
-                           event.creator.username = req.session.loginUser.username;
-                           console.log(req.sessionID);
-                           //save event to db
-                           event.save();
-                           console.log('Update event successfully!');
-                           res.status(200).send({
-                               isUpdated :true
-                           });
-                       }
-                   });
-               }else{
-                   console.log("error,user don't have permission to do that!");
-                   res.status(200).send({
-                       isUpdated :false
-                   });
-               }
+               Event.findByIdAndUpdate(req.params.id, req.body.event, function (err, event) {
+                   if (err){
+                       console.log(err);
+                       res.status(400).send({isUpdated :false,'msg':'update-event-failed'});
+                   }else{
+                       //event creator remains the same
+                       event.creator.id = req.session.loginUser.id;
+                       event.creator.username = req.session.loginUser.username;
+                       console.log(req.sessionID);
+                       //save event to db
+                       event.save();
+                       console.log('Update event successfully!');
+                       res.status(200).send({
+                           isUpdated :true
+                       });
+                   }
+               });
+               console.log("error,user don't have permission to do that!");
+               res.status(200).send({
+                   isUpdated :false
+               });
            }
         });
     }
