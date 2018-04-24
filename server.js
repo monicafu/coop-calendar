@@ -78,8 +78,8 @@ function cryptPwd(password) {
 
 
 // --- Listener ---
-app.listen(PORT, () => {
-    console.log(`Server listening at http://${env.SERVER_HOST}:${PORT}`);
+app.listen( process.env.PORT || PORT, () => {
+    console.log(`Server listening at http://${ env.SERVER_HOST }:${ process.env.PORT || PORT }`);
 });
 
 // --- Login ---

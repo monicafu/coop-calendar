@@ -1,17 +1,22 @@
 {
   "name": "calendar",
   "version": "1.0.0",
-  "description": "A group calendar\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[C\u001b[C\u001b[C\u001b[\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C calendar for group",
+  "description": "CoopCalendar is an agenda-management and team-collaboration web calendar",
   "main": "server.js",
+  "engines": {
+    "node": "8.9.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "start": "node server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "client": "npm run react-start",
     "server": "node server.js",
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
-    "react-eject": "react-scripts eject"
+    "react-eject": "react-scripts eject",
+    "heroku-postbuild": "npm install && npm install --only=dev --no-shrinkwrap && npm run react-build",
   },
   "repository": {
     "type": "git",
@@ -54,5 +59,15 @@
   },
   "devDependencies": {
     "concurrently": "^3.5.1"
-  }
+  },
+  "cacheDirectories": [
+    "node_modules"
+  ],
+  "keywords": [
+    "node",
+    "heroku",
+    "create-react-app",
+    "react",
+    "calendar"
+  ]
 }
