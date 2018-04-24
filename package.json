@@ -5,9 +5,13 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client": "cd client && npm start",
+    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "client": "npm run react-start",
     "server": "node server.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test --env=jsdom",
+    "react-eject": "react-scripts eject"
   },
   "repository": {
     "type": "git",
@@ -40,7 +44,13 @@
     "redis": "^2.8.0",
     "session-file-store": "^1.2.0",
     "universal-cookie-express": "^2.1.2",
-    "xss-filters": "^1.2.7"
+    "xss-filters": "^1.2.7",
+    "react": "^16.2.0",
+    "react-day-picker": "^7.1.4",
+    "react-dom": "^16.2.0",
+    "react-md-spinner": "^0.2.5",
+    "react-scripts": "1.1.1",
+    "react-tabs": "^2.2.1"
   },
   "devDependencies": {
     "concurrently": "^3.5.1"
