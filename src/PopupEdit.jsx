@@ -46,7 +46,6 @@ class PopupEdit extends Component {
 	handleEditEvent() {
 		let { event, warning } = this.state;
 		const { updateEvents, closePopup } = this.props;
-		console.log('handle event');
 
 		if ( check.empty(event.title) || check.empty(event.startDate) || check.empty(event.endDate) ) {
 			if ( check.empty(event.title) ) {

@@ -53,7 +53,6 @@ class App extends Component {
 
 	logout() {
 		cookie.remove('user');
-		console.log('logout');
 		userLogout('logout')
 		.then( result => {
 			if (!result.isLogin) {
